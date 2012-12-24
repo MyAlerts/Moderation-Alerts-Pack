@@ -25,7 +25,7 @@ function myalertsmore_info()
 	return array(
 		'name'          =>  'Moderation Alerts Pack',
 		'description'   =>  'Provides additional actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
-		'website'       =>  'http://euantor.com/myalerts',
+		'website'       =>  'http://idevicelab.net',
 		'author'        =>  'Shade',
 		'authorsite'    =>  'http://idevicelab.net',
 		'version'       =>  '1.0.1',
