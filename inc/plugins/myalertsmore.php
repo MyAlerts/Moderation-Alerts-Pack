@@ -24,7 +24,7 @@ function myalertsmore_info()
 {
 	return array(
 		'name'          =>  'Moderation Alerts Pack',
-		'description'   =>  'Provides additional actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#ff9090">MyAlerts is required for MyAlerts Moderation Alerts Pack to work</span>.',
+		'description'   =>  'Provides additional actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
 		'website'       =>  'http://euantor.com/myalerts',
 		'author'        =>  'Shade',
 		'authorsite'    =>  'http://idevicelab.net',
@@ -56,14 +56,13 @@ function myalertsmore_install()
 	}
 	
 	// check if a random myalerts setting exist - if false, then MyAlerts is not installed, warn the user and redirect him
-	if(!$mybb->settings['myalerts_alert_rep'])
+	if(!$mybb->settings['myalerts_enabled'])
 	{
-		flash_message("The selected plugin could not be installed because <a href=\"http://mods.mybb.com/view/myalerts\">MyAlerts</a> is not installed yet.", "error");
+		flash_message("The selected plugin could not be installed because <a href=\"http://mods.mybb.com/view/myalerts\">MyAlerts</a> is not installed. Moderation Alerts Pack requires MyAlerts to be installed in order to properly work.", "error");
 		admin_redirect("index.php?module=config-plugins");
 	}
 	
-	$PL or require_once PLUGINLIBRARY;
-	
+	$PL or require_once PLUGINLIBRARY;	
 	
 	// add extra hooks - needed for some alerts
 	$PL->edit_core('myalertsmore', 'warnings.php',
@@ -74,6 +73,17 @@ function myalertsmore_install()
 				// revoke warn alert
 					array('search' => 'redirect("warnings.php?action=view&wid={$warning[\'wid\']}", $lang->redirect_warning_revoked);',
                      	  'before' => '$plugins->run_hooks("warnings_do_revoke_end");'),
+					 ),
+               true);
+			   
+	$PL->edit_core('myalertsmore', 'editpost.php',
+				array(
+				// delete thread if firstpost
+					array('search' => 'delete_thread($tid);',
+                     	  'after' => '$plugins->run_hooks("editpost_delete_thread_firstpost");'),
+				// delete single post
+					array('search' => 'delete_post($pid, $tid);',
+                     	  'after' => '$plugins->run_hooks("editpost_deletesinglepost");'),
 					 ),
                true);
 			   
@@ -91,15 +101,22 @@ function myalertsmore_install()
 				// open single thread alert, merged in open multiple threads alert
 					array('search' => '$redirect = $lang->redirect_openthread;',
                      	  'after' => '$plugins->run_hooks("moderation_opensinglethread");'),
-				// delete multiple threads alert
-					array('search' => '$tid = intval($tid);',
-                     	  'after' => '$plugins->run_hooks("moderation_multideletethreads");'),
 				// move multiple threads alert
 					array('search' => '$moderation->move_threads($tids, $moveto);',
                      	  'after' => '$plugins->run_hooks("moderation_multimovethreads");'),
 				// move single thread alert
 					array('search' => 'moderation_redirect(get_thread_link($newtid), $lang->redirect_threadmoved);',
                      	  'before' => '$plugins->run_hooks("moderation_movesinglethread");'),
+				// delete posts
+					array('search' => '$moderation->delete_post($pid);',
+                     	  'after' => '$plugins->run_hooks("moderation_multideleteposts");'),
+				// delete posts
+					array('search' => '$moderation->delete_post($post[\'pid\']);',
+                     	  'after' => '$plugins->run_hooks("moderation_multideleteposts");'),
+				// delete thread - multiple matches (do_deleteposts, do_deletethreads, do_multideleteposts, do_multideletethreads)
+					array('search' => '$moderation->delete_thread($tid);',
+                     	  'after' => '$plugins->run_hooks("moderation_multideletethreads");',
+						  'multi' => true),
 					 ),
                true);
 			   
@@ -183,6 +200,15 @@ function myalertsmore_install()
 		"disporder" => "26",
 		"gid" => $gid,
 	);
+	$myalertsmore_settings_8 = array(
+		"name" => "myalerts_alert_multideleteposts",
+		"title" => $lang->setting_myalertsmore_alert_multideleteposts,
+		"description" => $lang->setting_myalertsmore_alert_multideleteposts_desc,
+		"optionscode" => "yesno",
+		"value" => "1",
+		"disporder" => "27",
+		"gid" => $gid,
+	);
 	$db->insert_query("settings", $myalertsmore_settings_1);
 	$db->insert_query("settings", $myalertsmore_settings_2);
 	$db->insert_query("settings", $myalertsmore_settings_3);
@@ -190,6 +216,7 @@ function myalertsmore_install()
 	$db->insert_query("settings", $myalertsmore_settings_5);
 	$db->insert_query("settings", $myalertsmore_settings_6);
 	$db->insert_query("settings", $myalertsmore_settings_7);
+	$db->insert_query("settings", $myalertsmore_settings_8);
 	
 	// Set our alerts on for all users by default, maintaining existing alerts values
     // Declare a data array containing all our alerts settings we'd like to add. To default them, the array must be associative and keys must be set to "on" (active) or 0 (not active)
@@ -201,6 +228,7 @@ function myalertsmore_install()
             'multiopenthreads' => "on",
             'multimovethreads' => "on",
             'editpost' => "on",
+            'multideleteposts' => "on",
             );
     
     $query = $db->simple_select('users', 'uid, myalerts_settings', '', array());
@@ -244,8 +272,11 @@ function myalertsmore_uninstall()
 	$PL->edit_core('myalertsmore', 'xmlhttp.php',
                array(),
                true);
+	$PL->edit_core('myalertsmore', 'editpost.php',
+               array(),
+               true);
 			   	
-	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost')");
+	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts')");
 		
 	// rebuild settings
 	rebuild_settings();
@@ -303,6 +334,11 @@ function myalertsmore_parseAlerts(&$alert)
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_editpost, $alert['user'], $alert['postLink'], $alert['dateline']);
 		$alert['rowType'] = 'editpostAlert';
 	}
+	elseif ($alert['alert_type'] == 'multideleteposts' AND $mybb->user['myalerts_settings']['multideleteposts'])
+	{
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_multideleteposts, $alert['user'], $alert['content']['threadUrl'], $alert['dateline'], $alert['content']['threadName']);
+		$alert['rowType'] = 'multideletepostsAlert';
+	}
 }
 
 // add alerts into UCP
@@ -316,16 +352,12 @@ function myalertsmore_possibleSettings(&$possible_settings)
 		$lang->load('myalertsmore');
 	}
 	
-	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost');
+	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts');
 	
 	$possible_settings = array_merge($possible_settings, $_possible_settings);
 }
 
-
-
-
-
-
+// Generate the actual alerts
 
 // WARN AN USER
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_warn'])
@@ -364,6 +396,7 @@ if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multideletethrea
 {
 	$plugins->add_hook('moderation_do_deletethread', 'myalertsmore_addAlert_singledeletethread');
 	$plugins->add_hook('moderation_multideletethreads', 'myalertsmore_addAlert_multideletethreads');
+	$plugins->add_hook('editpost_delete_thread_firstpost', 'myalertsmore_addAlert_multideletethreads');
 }
 // multiple threads
 function myalertsmore_addAlert_multideletethreads()
@@ -551,6 +584,33 @@ function myalertsmore_addAlert_editpost_quick()
 		$Alerts->addAlert((int) $post['uid'], 'editpost', (int) $post['tid'], (int) $mybb->user['uid'], array(
 			'pid'  =>  $post['pid'],
 			'tid'  =>  $post['tid'],
+		));
+	}
+}
+
+
+// DELETE POSTS, SINGLE AND MULTIPLE
+if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multideleteposts'])
+{
+	$plugins->add_hook('moderation_multideleteposts', 'myalertsmore_addAlert_multideleteposts');
+	$plugins->add_hook('editpost_deletesinglepost', 'myalertsmore_addAlert_multideleteposts');
+}
+function myalertsmore_addAlert_multideleteposts()
+{
+	global $mybb, $Alerts, $post, $tid, $pid;
+	
+	// there are a lot of queries here. If someone knows a better way to handle this, we need to know tid, thread link and thread name. Help is appreciated.
+	$post = get_post($pid);
+	$tid = $post['tid'];
+	
+	$threadUrl = get_thread_link($tid);
+	$threadInfo = get_thread($tid);
+	
+	// check if post belongs to the user itself. Is it not? Then alert the user!
+	if($post['uid'] != $mybb->user['uid']) {
+		$Alerts->addAlert((int) $post['uid'], 'multideleteposts', (int) $tid, (int) $mybb->user['uid'], array(
+			'threadUrl'  =>  $threadUrl,
+			'threadName'  =>  $threadInfo['subject'],
 		));
 	}
 }

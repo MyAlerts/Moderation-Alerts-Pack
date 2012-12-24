@@ -13,3 +13,5 @@ $l['setting_myalertsmore_alert_multimovethreads'] = "Alert on thread moving?";
 $l['setting_myalertsmore_alert_multimovethreads_desc'] = "Do you wish for users to receive a new alert when any of their threads is moved?";
 $l['setting_myalertsmore_alert_editpost'] = "Alert on post editing?";
 $l['setting_myalertsmore_alert_editpost_desc'] = "Do you wish for users to receive a new alert when any of their posts is edited?";
+$l['setting_myalertsmore_alert_multideleteposts'] = "Alert on post deletion?";
+$l['setting_myalertsmore_alert_multideleteposts_desc'] = "Do you wish for users to receive a new alert when any of their posts is deleted?";
