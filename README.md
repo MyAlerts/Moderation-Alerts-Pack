@@ -3,7 +3,7 @@ Moderation Alerts Pack
 
 **IMPORTANT**: *Thanks to this GitHub Repo you can track bugfixes and keep your Moderation Alerts Pack copy up to date, but keep in mind that this is a <strong>development version</strong>. Therefore, you may encounter errors and relevant bugs using this version, although I will try to leave its code as functional as possible.*
 
-> **Current version** 1.0  
+> **Current version** 1.0.1  
 > **Dependencies** MyAlerts, available to download [here][1]  
 > **Author** Shade  
 > **Special thanks goes to...** euantor who developed MyAlerts, the best notification plugin ever made for MyBB installations.
@@ -20,9 +20,10 @@ If you have any feature request, suggestion, or you want to report any issue, pl
 Main features
 -------------
 
-At the moment, MyAlerts Moderation Alerts Pack comes with **7 additional alerts**, but I've planned to add even more during 2013. Its settings are safely added to existing MyAlerts settings group and updated consequently: you can obviously turn on and off them as you would do with the standard 5 alerts. You can be notified:
+At the moment, MyAlerts Moderation Alerts Pack comes with **8 additional alerts**, but I've planned to add even more during 2013. Its settings are safely added to existing MyAlerts settings group and updated consequently: you can obviously turn on and off them as you would do with the standard 5 alerts. You can be notified:
 
 * When someone edits your posts
+* When someone deletes your posts
 * When someone deletes your threads
 * When someone opens your threads
 * When someone closes your threads
@@ -35,7 +36,6 @@ Looking forward to the future
 
 As I said before, I'm planning to add even more alerts to extend the plugin. The following alerts will be shortly available, not necessary in the order below:
 
-* When someone deletes your posts
 * When you're promoted to an usergroup within the core promotion system
 * When someone suspends your signature
 * When someone edits your signature
