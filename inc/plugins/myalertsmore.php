@@ -1,13 +1,13 @@
 <?php
 /**
- * MyAlerts Moderation Alerts Pack 1.0
+ * Moderation Alerts Pack 1.0.1
  * 
  * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
  *
- * @package MyAlerts Moderation Alerts Pack 1.0beta4
+ * @package Moderation Alerts Pack 1.0.1
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.0
+ * @version 1.0.1
  */
  
 if (!defined('IN_MYBB'))
@@ -23,13 +23,14 @@ if(!defined("PLUGINLIBRARY"))
 function myalertsmore_info()
 {
 	return array(
-		'name'          =>  'MyAlerts Extension',
+		'name'          =>  'Moderation Alerts Pack',
 		'description'   =>  'Provides additional actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#ff9090">MyAlerts is required for MyAlerts Moderation Alerts Pack to work</span>.',
 		'website'       =>  'http://euantor.com/myalerts',
 		'author'        =>  'Shade',
-		'authorsite'    =>  '9f724627ed35cb4a41ee5453f09ee384',
-		'version'       =>  '1.0',
+		'authorsite'    =>  'http://idevicelab.net',
+		'version'       =>  '1.0.1',
 		'compatibility' =>  '16*',
+		'guid'           =>  '9f724627ed35cb4a41ee5453f09ee384',
 		);
 }
 
@@ -250,9 +251,83 @@ function myalertsmore_uninstall()
 	rebuild_settings();
 }
 
-// WARN AN USER
 
-// firstly, add the actual alert...
+// generate text and stuff like that - fixes #1
+$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlerts');
+function myalertsmore_parseAlerts(&$alert)
+{
+	global $mybb, $lang;
+	
+	if (!$lang->myalertsmore)
+	{
+		$lang->load('myalertsmore');
+	}
+	
+	if ($alert['alert_type'] == 'warn' AND $mybb->user['myalerts_settings']['warn'])
+	{
+		$alert['expires'] = my_date($mybb->settings['dateformat'], $alert['content']['expires']).", ".my_date($mybb->settings['timeformat'], $alert['content']['expires']);
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_warn, $alert['user'], $alert['content']['points'], $alert['dateline'], $alert['expires']);
+		$alert['rowType'] = 'warnAlert';
+	}
+	elseif ($alert['alert_type'] == 'revokewarn' AND $mybb->user['myalerts_settings']['revokewarn'])
+	{
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_revokewarn, $alert['user'], $alert['content']['points'], $alert['dateline']);
+		$alert['rowType'] = 'revokewarnAlert';
+	}
+	elseif ($alert['alert_type'] == 'multideletethreads' AND $mybb->user['myalerts_settings']['multideletethreads'])
+	{
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_multideletethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline']);
+		$alert['rowType'] = 'multideletethreadsAlert';
+	}
+	elseif ($alert['alert_type'] == 'multiclosethreads' AND $mybb->user['myalerts_settings']['multiclosethreads'])
+	{
+		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiclosethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
+		$alert['rowType'] = 'multiclosethreadsAlert';
+	}
+	elseif ($alert['alert_type'] == 'multiopenthreads' AND $mybb->user['myalerts_settings']['multiopenthreads'])
+	{
+		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiopenthreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
+		$alert['rowType'] = 'multiopenthreadsAlert';
+	}
+	elseif ($alert['alert_type'] == 'multimovethreads' AND $mybb->user['myalerts_settings']['multimovethreads'])
+	{
+		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_multimovethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink'], $alert['content']['forumName'], $alert['content']['forumLink']);
+		$alert['rowType'] = 'multimovethreadsAlert';
+	}
+	elseif ($alert['alert_type'] == 'editpost' AND $mybb->user['myalerts_settings']['editpost'])
+	{
+		$alert['postLink'] = $mybb->settings['bburl'].'/'.get_post_link($alert['content']['pid'], $alert['content']['tid']).'#pid'.$alert['content']['pid'];
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_editpost, $alert['user'], $alert['postLink'], $alert['dateline']);
+		$alert['rowType'] = 'editpostAlert';
+	}
+}
+
+// add alerts into UCP
+$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_possibleSettings');
+function myalertsmore_possibleSettings(&$possible_settings)
+{
+	global $lang;
+	
+	if (!$lang->myalertsmore)
+	{
+		$lang->load('myalertsmore');
+	}
+	
+	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost');
+	
+	$possible_settings = array_merge($possible_settings, $_possible_settings);
+}
+
+
+
+
+
+
+
+// WARN AN USER
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_warn'])
 {
 	$plugins->add_hook('warnings_do_warn_end', 'myalertsmore_addAlert_warn');
@@ -268,43 +343,8 @@ function myalertsmore_addAlert_warn()
 	);
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_warn');
-function myalertsmore_parseAlert_warn(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'warn' AND $mybb->user['myalerts_settings']['warn'])
-	{
-		$alert['expires'] = my_date($mybb->settings['dateformat'], $alert['content']['expires']).", ".my_date($mybb->settings['timeformat'], $alert['content']['expires']);
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_warn, $alert['user'], $alert['content']['points'], $alert['dateline'], $alert['expires']);
-		$alert['rowType'] = 'warnAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_warn');
-function myalertsmore_alerts_warn(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'warn';
-}
-
 
 // REVOKE A WARNING
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_revokewarn'])
 {
 	$plugins->add_hook('warnings_do_revoke_end', 'myalertsmore_addAlert_revokewarn');
@@ -318,42 +358,8 @@ function myalertsmore_addAlert_revokewarn()
 	));
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_revokewarn');
-function myalertsmore_parseAlert_revokewarn(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'revokewarn' AND $mybb->user['myalerts_settings']['revokewarn'])
-	{
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_revokewarn, $alert['user'], $alert['content']['points'], $alert['dateline']);
-		$alert['rowType'] = 'revokewarnAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_revokewarn');
-function myalertsmore_alerts_revokewarn(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'revokewarn';
-}
-
 
 // DELETE MULTIPLE THREADS & SINGLE THREAD
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multideletethreads'])
 {
 	$plugins->add_hook('moderation_do_deletethread', 'myalertsmore_addAlert_singledeletethread');
@@ -380,42 +386,8 @@ function myalertsmore_addAlert_singledeletethread()
 	));
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_multideletethreads');
-function myalertsmore_parseAlert_multideletethreads(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'multideletethreads' AND $mybb->user['myalerts_settings']['multideletethreads'])
-	{
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_multideletethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline']);
-		$alert['rowType'] = 'multideletethreadsAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_multideletethreads');
-function myalertsmore_alerts_multideletethreads(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'multideletethreads';
-}
-
 
 // CLOSE MULTIPLE THREADS & SINGLE THREAD
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multiclosethreads'])
 {
 	$plugins->add_hook('moderation_multiclosethreads', 'myalertsmore_addAlert_multiclosethreads');
@@ -455,42 +427,8 @@ function myalertsmore_addAlert_closesinglethread()
 	}
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_multiclosethreads');
-function myalertsmore_parseAlert_multiclosethreads(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'multiclosethreads' AND $mybb->user['myalerts_settings']['multiclosethreads'])
-	{
-		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiclosethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
-		$alert['rowType'] = 'multiclosethreadsAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_multiclosethreads');
-function myalertsmore_alerts_multiclosethreads(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'multiclosethreads';
-}
 
 // OPEN MULTIPLE THREADS & SINGLE THREAD
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multiopenthreads'])
 {
 	$plugins->add_hook('moderation_multiopenthreads', 'myalertsmore_addAlert_multiopenthreads');
@@ -530,43 +468,8 @@ function myalertsmore_addAlert_opensinglethread()
 	}
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_multiopenthreads');
-function myalertsmore_parseAlert_multiopenthreads(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'multiopenthreads' AND $mybb->user['myalerts_settings']['multiopenthreads'])
-	{
-		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiopenthreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
-		$alert['rowType'] = 'multiopenthreadsAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_multiopenthreads');
-function myalertsmore_alerts_multiopenthreads(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'multiopenthreads';
-}
-
 
 // MOVE MULTIPLE THREADS & SINGLE THREAD
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multimovethreads'])
 {
 	$plugins->add_hook('moderation_multimovethreads', 'myalertsmore_addAlert_multimovethreads');
@@ -613,43 +516,8 @@ function myalertsmore_addAlert_movesinglethread()
 	}
 }
 
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_multimovethreads');
-function myalertsmore_parseAlert_multimovethreads(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'multimovethreads' AND $mybb->user['myalerts_settings']['multimovethreads'])
-	{
-		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_multimovethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink'], $alert['content']['forumName'], $alert['content']['forumLink']);
-		$alert['rowType'] = 'multimovethreadsAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_multimovethreads');
-function myalertsmore_alerts_multimovethreads(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'multimovethreads';
-}
-
 
 // EDIT A POST, QUICK AND FULL
-
-// firstly, add the actual alert...
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_editpost'])
 {
 	$plugins->add_hook('editpost_do_editpost_end', 'myalertsmore_addAlert_editpost');
@@ -685,37 +553,4 @@ function myalertsmore_addAlert_editpost_quick()
 			'tid'  =>  $post['tid'],
 		));
 	}
-}
-
-// ... secondly, generate text and similar stuff...
-$plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlert_editpost');
-function myalertsmore_parseAlert_editpost(&$alert)
-{
-	global $mybb, $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	if ($alert['alert_type'] == 'editpost' AND $mybb->user['myalerts_settings']['editpost'])
-	{
-		$alert['postLink'] = $mybb->settings['bburl'].'/'.get_post_link($alert['content']['pid'], $alert['content']['tid']).'#pid'.$alert['content']['pid'];
-		$alert['message'] = $lang->sprintf($lang->myalertsmore_editpost, $alert['user'], $alert['postLink'], $alert['dateline']);
-		$alert['rowType'] = 'editpostAlert';
-	}
-}
-
-// ... and thirdly, add settings into UCP!
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_alerts_editpost');
-function myalertsmore_alerts_editpost(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$possible_settings[] = 'editpost';
 }
