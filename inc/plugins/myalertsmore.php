@@ -56,7 +56,7 @@ function myalertsmore_install()
 	}
 	
 	// check if a random myalerts setting exist - if false, then MyAlerts is not installed, warn the user and redirect him
-	if(!$mybb->settings['myalerts_enabled'])
+	if(!$db->table_exists('alerts'))
 	{
 		flash_message("The selected plugin could not be installed because <a href=\"http://mods.mybb.com/view/myalerts\">MyAlerts</a> is not installed. Moderation Alerts Pack requires MyAlerts to be installed in order to properly work.", "error");
 		admin_redirect("index.php?module=config-plugins");
