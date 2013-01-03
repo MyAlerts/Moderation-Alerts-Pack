@@ -650,11 +650,26 @@ function myalertsmore_addAlert_multideleteposts()
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_suspendposting'])
 {
 	$plugins->add_hook('modcp_do_editprofile_update', 'myalertsmore_addAlert_suspendposting');
+	// ACP hook - the code there is copy&pasted from modcp.php, just hook to the same function
+	$plugins->add_hook('admin_user_users_edit_commit', 'myalertsmore_addAlert_suspendposting');
 }
 function myalertsmore_addAlert_suspendposting()
 {
-	global $mybb, $Alerts, $user, $extra_user_updates, $option;
-
+	global $mybb, $Alerts, $user, $extra_user_updates, $option, $db, $sort_options;
+	
+	// MyAlerts isn't instantiated. My apologies ACP... but we've got the solution for ya!
+	if(isset($sort_options['username'])) {
+		require_once MYALERTS_PLUGIN_PATH.'Alerts.class.php';
+		try
+		{
+			$Alerts = new Alerts($mybb, $db);
+		}
+		catch (Exception $e)
+		{
+			die($e->getMessage());
+		}
+	}
+	
 	if($extra_user_updates['suspendposting']) {
 		$Alerts->addAlert((int) $user['uid'], 'suspendposting', 0, (int) $mybb->user['uid'], array(
 			'expireDate'  =>  $extra_user_updates[$option['update_length']],
