@@ -435,18 +435,22 @@ function myalertsmore_addAlert_multideletethreads()
 	
 	// the code is hooked into a foreach loop, just alert the user after getting thread's infos
 	$thread = get_thread($tid);
-	$Alerts->addAlert((int) $thread['uid'], 'multideletethreads', 0, (int) $mybb->user['uid'], array(
-		'subject'  =>  $thread['subject'],
-	));
+	if($mybb->user['uid'] != $thread['uid']) {
+		$Alerts->addAlert((int) $thread['uid'], 'multideletethreads', 0, (int) $mybb->user['uid'], array(
+			'subject'  =>  $thread['subject'],
+		));
+	}
 }
 // single thread
 function myalertsmore_addAlert_singledeletethread()
 {
 	global $mybb, $Alerts, $thread;
 	
-	$Alerts->addAlert((int) $thread['uid'], 'multideletethreads', 0, (int) $mybb->user['uid'], array(
-		'subject'  =>  $thread['subject'],
-	));
+	if($mybb->user['uid'] != $thread['uid']) {
+		$Alerts->addAlert((int) $thread['uid'], 'multideletethreads', 0, (int) $mybb->user['uid'], array(
+			'subject'  =>  $thread['subject'],
+		));
+	}
 }
 
 
