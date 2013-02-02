@@ -17,3 +17,7 @@ $l['setting_myalertsmore_alert_multideleteposts'] = "Alert on post deletion?";
 $l['setting_myalertsmore_alert_multideleteposts_desc'] = "Do you wish for users to receive a new alert when any of their posts is deleted?";
 $l['setting_myalertsmore_alert_suspendposting'] = "Alert on posting suspension or unsuspension?";
 $l['setting_myalertsmore_alert_suspendposting_desc'] = "Do you wish for users to receive a new alert when they are suspended or unsuspended from posting?";
+$l['setting_myalertsmore_alert_moderateposting'] = "Alert on posting moderation or unmoderation?";
+$l['setting_myalertsmore_alert_moderateposting_desc'] = "Do you wish for users to receive a new alert when you set their posts to be moderated/unmoderated?";
+$l['setting_myalertsmore_alert_suspendsignature'] = "Alert on signature suspension or unsuspension?";
+$l['setting_myalertsmore_alert_suspendsignature_desc'] = "Do you wish for users to receive a new alert when you suspend/unsuspend their signatures?";

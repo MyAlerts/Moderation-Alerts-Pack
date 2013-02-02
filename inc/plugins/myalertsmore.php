@@ -1,13 +1,13 @@
 <?php
 /**
- * Moderation Alerts Pack 1.0.2
+ * Moderation Alerts Pack 1.0.3
  * 
  * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
  *
- * @package Moderation Alerts Pack 1.0.2
+ * @package Moderation Alerts Pack 1.0.3
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.0.2
+ * @version 1.0.3
  */
  
 if (!defined('IN_MYBB'))
@@ -28,7 +28,7 @@ function myalertsmore_info()
 		'website'       =>  'http://idevicelab.net',
 		'author'        =>  'Shade',
 		'authorsite'    =>  'http://idevicelab.net',
-		'version'       =>  '1.0.2',
+		'version'       =>  '1.0.3',
 		'compatibility' =>  '16*',
 		'guid'           =>  '9f724627ed35cb4a41ee5453f09ee384',
 		);
@@ -36,18 +36,18 @@ function myalertsmore_info()
 
 function myalertsmore_is_installed()
 {
-	global $mybb;
-	
-	// MyAlerts Extension obviously adds some settings. Just check a random one, if not present then the plugin isn't installed
-	if($mybb->settings['myalerts_alert_warn'])
-	{
-		return true;
-	}
+    global $cache;
+    
+    $installed = $cache->read("shade_plugins");
+    // check if plugin is installed
+    if ($installed['Moderation Alerts Pack']) {
+        return true;
+    }
 }
 
 function myalertsmore_install()
 {
-	global $db, $PL, $lang, $mybb;
+	global $db, $PL, $lang, $mybb, $cache;
 
 	if (!file_exists(PLUGINLIBRARY))
 	{
@@ -63,6 +63,15 @@ function myalertsmore_install()
 	}
 	
 	$PL or require_once PLUGINLIBRARY;	
+	
+	// simple cache creation - useful for updates
+    $info = myalertsmore_info();
+    $shade_plugins = $cache->read('shade_plugins');
+    $shade_plugins['Moderation Alerts Pack'] = array(
+        'title' => 'Moderation Alerts Pack',
+        'version' => $info['version']
+    );
+    $cache->update('shade_plugins', $shade_plugins);
 	
 	// add extra hooks - needed for some alerts
 	$PL->edit_core('myalertsmore', 'warnings.php',
@@ -218,6 +227,24 @@ function myalertsmore_install()
 		"disporder" => "28",
 		"gid" => $gid,
 	);
+	$myalertsmore_settings_10 = array(
+		"name" => "myalerts_alert_moderateposting",
+		"title" => $lang->setting_myalertsmore_alert_moderateposting,
+		"description" => $lang->setting_myalertsmore_alert_moderateposting_desc,
+		"optionscode" => "yesno",
+		"value" => "1",
+		"disporder" => "28",
+		"gid" => $gid,
+	);
+	$myalertsmore_settings_11 = array(
+		"name" => "myalerts_alert_suspendsignature",
+		"title" => $lang->setting_myalertsmore_alert_suspendsignature,
+		"description" => $lang->setting_myalertsmore_alert_suspendsignature_desc,
+		"optionscode" => "yesno",
+		"value" => "1",
+		"disporder" => "28",
+		"gid" => $gid,
+	);
 	$db->insert_query("settings", $myalertsmore_settings_1);
 	$db->insert_query("settings", $myalertsmore_settings_2);
 	$db->insert_query("settings", $myalertsmore_settings_3);
@@ -227,6 +254,8 @@ function myalertsmore_install()
 	$db->insert_query("settings", $myalertsmore_settings_7);
 	$db->insert_query("settings", $myalertsmore_settings_8);
 	$db->insert_query("settings", $myalertsmore_settings_9);
+	$db->insert_query("settings", $myalertsmore_settings_10);
+	$db->insert_query("settings", $myalertsmore_settings_11);
 	
 	// Set our alerts on for all users by default, maintaining existing alerts values
     // Declare a data array containing all our alerts settings we'd like to add. To default them, the array must be associative and keys must be set to "on" (active) or 0 (not active)
@@ -240,6 +269,8 @@ function myalertsmore_install()
             'editpost' => "on",
             'multideleteposts' => "on",
             'suspendposting' => "on",
+            'moderateposting' => "on",
+            'suspendsignature' => "on",
             );
     
     $query = $db->simple_select('users', 'uid, myalerts_settings', '', array());
@@ -263,7 +294,7 @@ function myalertsmore_install()
 
 function myalertsmore_uninstall()
 {
-	global $db, $PL;
+	global $db, $PL, $cache;
 	
 	if (!file_exists(PLUGINLIBRARY))
 	{
@@ -287,8 +318,12 @@ function myalertsmore_uninstall()
                array(),
                true);
 			   	
-	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting')");
-		
+	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature')");
+	
+    // delete the plugin from cache
+    $shade_plugins = $cache->read('shade_plugins');
+    unset($shade_plugins['Moderation Alert Pack']);
+    $cache->update('shade_plugins', $shade_plugins);
 	// rebuild settings
 	rebuild_settings();
 }
@@ -305,51 +340,60 @@ function myalertsmore_parseAlerts(&$alert)
 		$lang->load('myalertsmore');
 	}
 	
+	// warn
 	if ($alert['alert_type'] == 'warn' AND $mybb->user['myalerts_settings']['warn'])
 	{
 		$alert['expires'] = my_date($mybb->settings['dateformat'], $alert['content']['expires']).", ".my_date($mybb->settings['timeformat'], $alert['content']['expires']);
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_warn, $alert['user'], $alert['content']['points'], $alert['dateline'], $alert['expires']);
 		$alert['rowType'] = 'warnAlert';
 	}
+	// revoke warn
 	elseif ($alert['alert_type'] == 'revokewarn' AND $mybb->user['myalerts_settings']['revokewarn'])
 	{
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_revokewarn, $alert['user'], $alert['content']['points'], $alert['dateline']);
 		$alert['rowType'] = 'revokewarnAlert';
 	}
+	// delete threads
 	elseif ($alert['alert_type'] == 'multideletethreads' AND $mybb->user['myalerts_settings']['multideletethreads'])
 	{
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_multideletethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline']);
 		$alert['rowType'] = 'multideletethreadsAlert';
 	}
+	// close threads
 	elseif ($alert['alert_type'] == 'multiclosethreads' AND $mybb->user['myalerts_settings']['multiclosethreads'])
 	{
 		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiclosethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
 		$alert['rowType'] = 'multiclosethreadsAlert';
 	}
+	// open threads
 	elseif ($alert['alert_type'] == 'multiopenthreads' AND $mybb->user['myalerts_settings']['multiopenthreads'])
 	{
 		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_multiopenthreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink']);
 		$alert['rowType'] = 'multiopenthreadsAlert';
 	}
+	// move threads
 	elseif ($alert['alert_type'] == 'multimovethreads' AND $mybb->user['myalerts_settings']['multimovethreads'])
 	{
 		$alert['threadLink'] = get_thread_link($alert['content']['tid']);
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_multimovethreads, $alert['user'], htmlspecialchars_uni($alert['content']['subject']), $alert['dateline'], $alert['threadLink'], $alert['content']['forumName'], $alert['content']['forumLink']);
 		$alert['rowType'] = 'multimovethreadsAlert';
 	}
+	// edit posts
 	elseif ($alert['alert_type'] == 'editpost' AND $mybb->user['myalerts_settings']['editpost'])
 	{
 		$alert['postLink'] = $mybb->settings['bburl'].'/'.get_post_link($alert['content']['pid'], $alert['content']['tid']).'#pid'.$alert['content']['pid'];
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_editpost, $alert['user'], $alert['postLink'], $alert['dateline']);
 		$alert['rowType'] = 'editpostAlert';
 	}
+	// delete posts
 	elseif ($alert['alert_type'] == 'multideleteposts' AND $mybb->user['myalerts_settings']['multideleteposts'])
 	{
 		$alert['message'] = $lang->sprintf($lang->myalertsmore_multideleteposts, $alert['user'], $alert['content']['threadUrl'], $alert['dateline'], $alert['content']['threadName']);
 		$alert['rowType'] = 'multideletepostsAlert';
 	}
+	// posting suspension
 	elseif ($alert['alert_type'] == 'suspendposting' AND $mybb->user['myalerts_settings']['suspendposting'])
 	{
 		// workaround for different alert into one setting - pretty cool uh?
@@ -369,6 +413,46 @@ function myalertsmore_parseAlerts(&$alert)
 			$alert['rowType'] = 'suspendpostingAlert';
 		}
 	}
+	// posting moderation
+	elseif ($alert['alert_type'] == 'moderateposting' AND $mybb->user['myalerts_settings']['moderateposting'])
+	{
+		// workaround for different alert into one setting - pretty cool uh?
+		if($alert['content']['unsuspendCheck']) {
+			$alert['message'] = $lang->sprintf($lang->myalertsmore_unmoderateposting, $alert['user'], $alert['dateline']);
+			$alert['rowType'] = 'unmoderatepostingAlert';
+		}
+		else {
+			// permanent suspension?
+			if($alert['content']['expireDate'] == "0") {
+				$alert['expiryDate'] = $lang->myalertsmore_expire_never;
+			}
+			else {
+				$alert['expiryDate'] = my_date($mybb->settings['dateformat'], $alert['content']['expireDate']).", ".my_date($mybb->settings['timeformat'], $alert['content']['expireDate']);
+			}
+			$alert['message'] = $lang->sprintf($lang->myalertsmore_moderateposting, $alert['user'], $alert['expiryDate'], $alert['dateline']);
+			$alert['rowType'] = 'moderatepostingAlert';
+		}
+	}
+	// signature suspension
+	elseif ($alert['alert_type'] == 'suspendsignature' AND $mybb->user['myalerts_settings']['suspendsignature'])
+	{
+		// workaround for different alert into one setting - pretty cool uh?
+		if($alert['content']['unsuspendCheck']) {
+			$alert['message'] = $lang->sprintf($lang->myalertsmore_unsuspendsignature, $alert['user'], $alert['dateline']);
+			$alert['rowType'] = 'unsuspendsignatureAlert';
+		}
+		else {
+			// permanent suspension?
+			if($alert['content']['expireDate'] == "0") {
+				$alert['expiryDate'] = $lang->myalertsmore_expire_never;
+			}
+			else {
+				$alert['expiryDate'] = my_date($mybb->settings['dateformat'], $alert['content']['expireDate']).", ".my_date($mybb->settings['timeformat'], $alert['content']['expireDate']);
+			}
+			$alert['message'] = $lang->sprintf($lang->myalertsmore_suspendsignature, $alert['user'], $alert['expiryDate'], $alert['dateline']);
+			$alert['rowType'] = 'suspendsignatureAlert';
+		}
+	}
 }
 
 // add alerts into UCP
@@ -382,7 +466,7 @@ function myalertsmore_possibleSettings(&$possible_settings)
 		$lang->load('myalertsmore');
 	}
 	
-	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting');
+	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature');
 	
 	$possible_settings = array_merge($possible_settings, $_possible_settings);
 }
@@ -650,14 +734,14 @@ function myalertsmore_addAlert_multideleteposts()
 }
 
 
-// SUSPEND POSTING
+// SUSPEND POSTING, MODERATE POSTING, SUSPEND SIGNATURE & OPPOSITES
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_suspendposting'])
 {
-	$plugins->add_hook('modcp_do_editprofile_update', 'myalertsmore_addAlert_suspendposting');
+	$plugins->add_hook('modcp_do_editprofile_update', 'myalertsmore_addAlert_suspensions');
 	// ACP hook - the code there is copy&pasted from modcp.php, just hook to the same function
-	$plugins->add_hook('admin_user_users_edit_commit', 'myalertsmore_addAlert_suspendposting');
+	$plugins->add_hook('admin_user_users_edit_commit', 'myalertsmore_addAlert_suspensions');
 }
-function myalertsmore_addAlert_suspendposting()
+function myalertsmore_addAlert_suspensions()
 {
 	global $mybb, $Alerts, $user, $extra_user_updates, $option, $db, $sort_options;
 	
@@ -674,14 +758,40 @@ function myalertsmore_addAlert_suspendposting()
 		}
 	}
 	
-	if($extra_user_updates['suspendposting']) {
+	// suspend posting...
+	if(!empty($extra_user_updates['suspendposting'])) {
 		$Alerts->addAlert((int) $user['uid'], 'suspendposting', 0, (int) $mybb->user['uid'], array(
-			'expireDate'  =>  $extra_user_updates[$option['update_length']],
+			'expireDate'  =>  $extra_user_updates['suspensiontime'],
 		));
 	}
-	elseif(!$mybb->input[$option['action']] && $user['suspendposting']) {
+	// ... moderate posting
+	elseif(!empty($extra_user_updates['moderateposts'])) {
+		$Alerts->addAlert((int) $user['uid'], 'moderateposting', 0, (int) $mybb->user['uid'], array(
+			'expireDate'  =>  $extra_user_updates['moderationtime'],
+		));
+	}
+	// must be a revoke of posting suspension...
+	elseif(!$mybb->input['suspendposting'] && !empty($user['suspendposting'])) {
 		$Alerts->addAlert((int) $user['uid'], 'suspendposting', 0, (int) $mybb->user['uid'], array(
 			'unsuspendCheck'  =>  1, // MyAlerts doesn't display any alert if it hasn't its corresponding UCP setting. Let's workaround this!
+		));
+	}
+	// must be a revoke of posting moderation...
+	elseif(!$mybb->input['moderateposting'] && !empty($user['moderateposts'])) {
+		$Alerts->addAlert((int) $user['uid'], 'moderateposting', 0, (int) $mybb->user['uid'], array(
+			'unsuspendCheck'  =>  1,
+		));
+	}
+	// suspend signature!
+	if(!empty($extra_user_updates['suspendsignature'])) {
+		$Alerts->addAlert((int) $user['uid'], 'suspendsignature', 0, (int) $mybb->user['uid'], array(
+			'expireDate'  =>  $extra_user_updates['suspendsigtime'],
+		));
+	}
+	// must be a revoke of signature suspension...
+	elseif(!$mybb->input['suspendsignature'] && !empty($user['suspendsignature'])) {
+		$Alerts->addAlert((int) $user['uid'], 'suspendsignature', 0, (int) $mybb->user['uid'], array(
+			'unsuspendCheck'  =>  1,
 		));
 	}
 }
