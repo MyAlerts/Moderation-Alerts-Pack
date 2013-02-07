@@ -1,8 +1,6 @@
 Moderation Alerts Pack
 ===============================
 
-**IMPORTANT**: *Thanks to this GitHub Repo you can track bugfixes and keep your Moderation Alerts Pack copy up to date, but keep in mind that this is a <strong>development version</strong>. Therefore, you may encounter errors and relevant bugs using this version, although I will try to leave its code as functional as possible.*
-
 > **Current version** 1.0.3  
 > **Dependencies** MyAlerts, available to download [here][1], and PluginLibrary, which is required to install MyAlerts  
 > **Author** Shade  
