@@ -322,7 +322,7 @@ function myalertsmore_uninstall()
 	
     // delete the plugin from cache
     $shade_plugins = $cache->read('shade_plugins');
-    unset($shade_plugins['Moderation Alert Pack']);
+    unset($shade_plugins['Moderation Alerts Pack']);
     $cache->update('shade_plugins', $shade_plugins);
 	// rebuild settings
 	rebuild_settings();
