@@ -38,8 +38,9 @@ function myalertsmore_is_installed()
 {
     global $cache;
     
+	$info = myalertsmore_info();
     $installed = $cache->read("shade_plugins");
-    if ($installed['Moderation Alerts Pack']) {
+    if ($installed[$info['name']]) {
         return true;
     }
 }
@@ -292,15 +293,23 @@ function myalertsmore_install()
 
     $db->insert_query_multiple('alert_settings', $insertArray);
 	
-	$query = $db->simple_select('alert_settings', '*', 'setting_id > 5');
 	$query = $db->simple_select('users', 'uid');
 	
-	$userSettings = array();
-	foreach ($db->fetch_array($query) as $uid) {
-		foreach ($ucpArray as $setting) {
+	while ($uids = $db->fetch_array($query)) {
+		$users[] = $uids['uid'];
+	}
+	
+	$query = $db->simple_select("alert_settings", "*", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+	
+	while ($setting = $db->fetch_array($query)) {
+		$settings[] = $setting['id'];
+	}
+
+	foreach ($users as $user) {
+		foreach ($settings as $setting) {
 			$userSettings[] = array(
-            	'user_id'    => (int) $uid,
-            	'setting_id' => $setting,
+            	'user_id'    => (int) $user,
+            	'setting_id' => (int) $setting,
             	'value'      => 1,
 			);
 		}
