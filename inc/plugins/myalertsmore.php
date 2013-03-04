@@ -26,7 +26,7 @@ function myalertsmore_info()
 		'website' => 'http://www.idevicelab.net/forum',
 		'author' => 'Shade',
 		'authorsite' => 'http://www.idevicelab.net/forum',
-		'version' => '1.1',
+		'version' => '1.0.4',
 		'compatibility' => '16*',
 		'guid' => '9f724627ed35cb4a41ee5453f09ee384'
 	);
