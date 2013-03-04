@@ -1,8 +1,8 @@
 Moderation Alerts Pack
 ===============================
 
-> **Current version** 1.0.3  
-> **Dependencies** MyAlerts, available to download [here][1], and PluginLibrary, which is required to install MyAlerts  
+> **Current version** 1.0.4  
+> **Dependencies** MyAlerts 1.04 or higher, available to download [here][1], and PluginLibrary, which is required to install MyAlerts  
 > **Author** Shade  
 > **Special thanks goes to...** euantor who developed MyAlerts, the best notification plugin ever made for MyBB installations.
 
@@ -31,8 +31,6 @@ At the moment, MyAlerts Moderation Alerts Pack comes with **11 additional alerts
 * When someone suspends/unsuspends you from posting
 * When someone sets/unsets your posts to be moderated
 * When someone suspends/unsuspends your signature
-
-*Might be a slow process for large boards
 
 Looking forward to the future
 -----------------------------------
