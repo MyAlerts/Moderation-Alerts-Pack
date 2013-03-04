@@ -1,13 +1,13 @@
 <?php
 /**
- * Moderation Alerts Pack 1.0.3
+ * Moderation Alerts Pack
  * 
  * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
  *
- * @package Moderation Alerts Pack 1.0.3
+ * @package Moderation Alerts Pack
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.0.3
+ * @version 1.1
  */
  
 if (!defined('IN_MYBB'))
@@ -24,11 +24,11 @@ function myalertsmore_info()
 {
 	return array(
 		'name'          =>  'Moderation Alerts Pack',
-		'description'   =>  'Provides additional actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
-		'website'       =>  'http://idevicelab.net',
+		'description'   =>  'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
+		'website'       =>  'http://www.idevicelab.net/forum',
 		'author'        =>  'Shade',
-		'authorsite'    =>  'http://idevicelab.net',
-		'version'       =>  '1.0.3',
+		'authorsite'    =>  'http://www.idevicelab.net/forum',
+		'version'       =>  '1.1',
 		'compatibility' =>  '16*',
 		'guid'           =>  '9f724627ed35cb4a41ee5453f09ee384',
 		);
@@ -39,7 +39,6 @@ function myalertsmore_is_installed()
     global $cache;
     
     $installed = $cache->read("shade_plugins");
-    // check if plugin is installed
     if ($installed['Moderation Alerts Pack']) {
         return true;
     }
@@ -55,7 +54,7 @@ function myalertsmore_install()
 		admin_redirect("index.php?module=config-plugins");
 	}
 	
-	// check if a random myalerts setting exist - if false, then MyAlerts is not installed, warn the user and redirect him
+	// check if myalerts table exist - if false, then MyAlerts is not installed, warn the user and redirect him
 	if(!$db->table_exists('alerts'))
 	{
 		flash_message("The selected plugin could not be installed because <a href=\"http://mods.mybb.com/view/myalerts\">MyAlerts</a> is not installed. Moderation Alerts Pack requires MyAlerts to be installed in order to properly work.", "error");
@@ -64,14 +63,13 @@ function myalertsmore_install()
 	
 	$PL or require_once PLUGINLIBRARY;	
 	
-	// simple cache creation - useful for updates
     $info = myalertsmore_info();
-    $shade_plugins = $cache->read('shade_plugins');
-    $shade_plugins['Moderation Alerts Pack'] = array(
-        'title' => 'Moderation Alerts Pack',
+    $shadePlugins = $cache->read('shade_plugins');
+    $shadePlugins[$info['name']] = array(
+        'title' => $info['name'],
         'version' => $info['version']
     );
-    $cache->update('shade_plugins', $shade_plugins);
+    $cache->update('shade_plugins', $shadePlugins);
 	
 	// add extra hooks - needed for some alerts
 	$PL->edit_core('myalertsmore', 'warnings.php',
@@ -142,7 +140,6 @@ function myalertsmore_install()
 		$lang->load('myalertsmore');
 	}
 	
-	// search for myalerts existing settings and add our custom ones
 	$query = $db->simple_select("settinggroups", "gid", "name='myalerts'");
 	$gid = intval($db->fetch_field($query, "gid"));
 	
@@ -233,7 +230,7 @@ function myalertsmore_install()
 		"description" => $lang->setting_myalertsmore_alert_moderateposting_desc,
 		"optionscode" => "yesno",
 		"value" => "1",
-		"disporder" => "28",
+		"disporder" => "29",
 		"gid" => $gid,
 	);
 	$myalertsmore_settings_11 = array(
@@ -242,7 +239,7 @@ function myalertsmore_install()
 		"description" => $lang->setting_myalertsmore_alert_suspendsignature_desc,
 		"optionscode" => "yesno",
 		"value" => "1",
-		"disporder" => "28",
+		"disporder" => "30",
 		"gid" => $gid,
 	);
 	$db->insert_query("settings", $myalertsmore_settings_1);
@@ -257,37 +254,60 @@ function myalertsmore_install()
 	$db->insert_query("settings", $myalertsmore_settings_10);
 	$db->insert_query("settings", $myalertsmore_settings_11);
 	
-	// Set our alerts on for all users by default, maintaining existing alerts values
-    // Declare a data array containing all our alerts settings we'd like to add. To default them, the array must be associative and keys must be set to "on" (active) or 0 (not active)
-    $possible_settings = array(
-            'warn' => "on",
-            'revokewarn' => "on",
-            'multideletethreads' => "on",
-            'multiclosethreads' => "on",
-            'multiopenthreads' => "on",
-            'multimovethreads' => "on",
-            'editpost' => "on",
-            'multideleteposts' => "on",
-            'suspendposting' => "on",
-            'moderateposting' => "on",
-            'suspendsignature' => "on",
-            );
-    
-    $query = $db->simple_select('users', 'uid, myalerts_settings', '', array());
-    
-    while($settings = $db->fetch_array($query))
-    {
-        // decode existing alerts with corresponding key values. json_decode func returns an associative array by default, we don't need to edit it
-        $alert_settings = json_decode($settings['myalerts_settings']);
-        
-        // merge our settings with existing ones...
-        $my_settings = array_merge($possible_settings, (array) $alert_settings);
-        
-        // and update the table cell, encoding our modified array and paying attention to SQL inj (thanks Nathan!)
-        $db->update_query('users', array('myalerts_settings' => $db->escape_string(json_encode($my_settings))), 'uid='.(int) $settings['uid']);
-    }
-		
-	// rebuild settings
+	$insertArray = array(
+        0 => array(
+            'code' => 'warn',
+        ),
+        1 => array(
+            'code' => 'revokewarn',
+        ),
+        2 => array(
+            'code' => 'multideletethreads',
+        ),
+        3 => array(
+            'code' => 'multiclosethreads',
+        ),
+        4 => array(
+            'code' => 'multiopenthreads',
+        ),
+        5 => array(
+            'code' => 'multimovethreads',
+        ),
+        6 => array(
+            'code' => 'editpost',
+        ),
+        7 => array(
+            'code' => 'multideleteposts',
+        ),
+        8 => array(
+            'code' => 'suspendposting',
+        ),
+        9 => array(
+            'code' => 'moderateposting',
+        ),
+        10 => array(
+            'code' => 'suspendsignature',
+        )
+    );
+
+    $db->insert_query_multiple('alert_settings', $insertArray);
+	
+	$query = $db->simple_select('alert_settings', '*', 'setting_id > 5');
+	$query = $db->simple_select('users', 'uid');
+	
+	$userSettings = array();
+	foreach ($db->fetch_array($query) as $uid) {
+		foreach ($ucpArray as $setting) {
+			$userSettings[] = array(
+            	'user_id'    => (int) $uid,
+            	'setting_id' => $setting,
+            	'value'      => 1,
+			);
+		}
+	}
+	
+	$db->insert_query_multiple('alert_setting_values', $userSettings);
+	
 	rebuild_settings();
 
 }
@@ -320,10 +340,11 @@ function myalertsmore_uninstall()
 			   	
 	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature')");
 	
+	$info = myalertsmore_info();
     // delete the plugin from cache
-    $shade_plugins = $cache->read('shade_plugins');
-    unset($shade_plugins['Moderation Alerts Pack']);
-    $cache->update('shade_plugins', $shade_plugins);
+    $shadePlugins = $cache->read('shade_plugins');
+    unset($shadePlugins[$info['name']]);
+    $cache->update('shade_plugins', $shadePlugins);
 	// rebuild settings
 	rebuild_settings();
 }
@@ -453,22 +474,6 @@ function myalertsmore_parseAlerts(&$alert)
 			$alert['rowType'] = 'suspendsignatureAlert';
 		}
 	}
-}
-
-// add alerts into UCP
-$plugins->add_hook('myalerts_possible_settings', 'myalertsmore_possibleSettings');
-function myalertsmore_possibleSettings(&$possible_settings)
-{
-	global $lang;
-	
-	if (!$lang->myalertsmore)
-	{
-		$lang->load('myalertsmore');
-	}
-	
-	$_possible_settings = array('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature');
-	
-	$possible_settings = array_merge($possible_settings, $_possible_settings);
 }
 
 // Generate the actual alerts
