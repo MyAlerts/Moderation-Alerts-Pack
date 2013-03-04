@@ -7,11 +7,7 @@
  * @package Moderation Alerts Pack
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
-<<<<<<< HEAD
- * @version 1.1
-=======
  * @version 1.0.4
->>>>>>> 1.1-dev
  */
 
 if (!defined('IN_MYBB')) {
@@ -315,7 +311,7 @@ function myalertsmore_install()
 	while ($uids = $db->fetch_array($query)) {
 		$users[] = $uids['uid'];
 	}
-
+	
 	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
 	while ($setting = $db->fetch_array($query)) {
 		$settings[] = $setting['id'];
@@ -365,10 +361,10 @@ function myalertsmore_uninstall()
 	$settings = implode(",", $settings);
 	
 	// truly delete them
-	$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");	
+	$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");
 	// delete UCP settings
 	$db->delete_query("alert_settings", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
-		
+	
 	$info = myalertsmore_info();
 	// delete the plugin from cache
 	$shadePlugins = $cache->read('shade_plugins');
@@ -384,7 +380,7 @@ function myalertsmore_load_lang()
 {
 	global $lang;
 	
-	if(!$lang->myalertsmore) {
+	if (!$lang->myalertsmore) {
 		$lang->load('myalertsmore');
 	}
 }
