@@ -1,4 +1,5 @@
 <?php
+$l['myalertsmore'] = "Moderation Alerts Pack";
 // usercp stuff MyAlerts itself loads
 $l['myalerts_setting_warn'] = "Receive alert when you're warned by a Team member?";
 $l['myalerts_setting_revokewarn'] = "Receive alert when a Team member revokes any of your active warnings?";
