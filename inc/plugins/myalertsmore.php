@@ -294,16 +294,11 @@ function myalertsmore_install()
     $db->insert_query_multiple('alert_settings', $insertArray);
 	
 	$query = $db->simple_select('users', 'uid');
+	$users = $db->fetch_array($query);
 	
-	while ($uids = $db->fetch_array($query)) {
-		$users[] = $uids['uid'];
-	}
+	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
 	
-	$query = $db->simple_select("alert_settings", "*", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
-	
-	while ($setting = $db->fetch_array($query)) {
-		$settings[] = $setting['id'];
-	}
+	$settings = $db->fetch_array($query);
 
 	foreach ($users as $user) {
 		foreach ($settings as $setting) {
