@@ -7,7 +7,7 @@
  * @package Moderation Alerts Pack
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.1
+ * @version 1.0.4
  */
 
 if (!defined('IN_MYBB')) {
@@ -351,8 +351,21 @@ function myalertsmore_uninstall()
 	$PL->edit_core('myalertsmore', 'xmlhttp.php', array(), true);
 	$PL->edit_core('myalertsmore', 'editpost.php', array(), true);
 	
+	// delete ACP settings
 	$db->write_query("DELETE FROM " . TABLE_PREFIX . "settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature')");
 	
+	// delete existing values
+	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+	while ($setting = $db->fetch_array($query)) {
+		$settings[] = $setting['id'];
+	}
+	$settings = implode(",", $settings);
+	
+	// truly delete them
+	$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");	
+	// delete UCP settings
+	$db->delete_query("alert_settings", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+		
 	$info = myalertsmore_info();
 	// delete the plugin from cache
 	$shadePlugins = $cache->read('shade_plugins');
@@ -362,6 +375,16 @@ function myalertsmore_uninstall()
 	rebuild_settings();
 }
 
+// load our custom lang file into MyAlerts
+$plugins->add_hook('myalerts_load_lang', 'myalertsmore_load_lang');
+function myalertsmore_load_lang()
+{
+	global $lang;
+	
+	if(!$lang->myalertsmore) {
+		$lang->load('myalertsmore');
+	}
+}
 
 // generate text and stuff like that - fixes #1
 $plugins->add_hook('myalerts_alerts_output_start', 'myalertsmore_parseAlerts');
