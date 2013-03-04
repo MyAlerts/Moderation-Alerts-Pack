@@ -25,17 +25,6 @@ if (!defined("PLUGINLIBRARY")) {
 function myalertsmore_info()
 {
 	return array(
-<<<<<<< HEAD
-		'name'          =>  'Moderation Alerts Pack',
-		'description'   =>  'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
-		'website'       =>  'http://www.idevicelab.net/forum',
-		'author'        =>  'Shade',
-		'authorsite'    =>  'http://www.idevicelab.net/forum',
-		'version'       =>  '1.1',
-		'compatibility' =>  '16*',
-		'guid'           =>  '9f724627ed35cb4a41ee5453f09ee384',
-		);
-=======
 		'name' => 'Moderation Alerts Pack',
 		'description' => 'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
 		'website' => 'http://www.idevicelab.net/forum',
@@ -45,19 +34,10 @@ function myalertsmore_info()
 		'compatibility' => '16*',
 		'guid' => '9f724627ed35cb4a41ee5453f09ee384'
 	);
->>>>>>> 1.1-dev
 }
 
 function myalertsmore_is_installed()
 {
-<<<<<<< HEAD
-    global $cache;
-    
-    $installed = $cache->read("shade_plugins");
-    if ($installed['Moderation Alerts Pack']) {
-        return true;
-    }
-=======
 	global $cache;
 	
 	$info = myalertsmore_info();
@@ -65,7 +45,6 @@ function myalertsmore_is_installed()
 	if ($installed[$info['name']]) {
 		return true;
 	}
->>>>>>> 1.1-dev
 }
 
 function myalertsmore_install()
@@ -78,27 +57,12 @@ function myalertsmore_install()
 	}
 	
 	// check if myalerts table exist - if false, then MyAlerts is not installed, warn the user and redirect him
-<<<<<<< HEAD
-	if(!$db->table_exists('alerts'))
-	{
-=======
 	if (!$db->table_exists('alerts')) {
->>>>>>> 1.1-dev
 		flash_message("The selected plugin could not be installed because <a href=\"http://mods.mybb.com/view/myalerts\">MyAlerts</a> is not installed. Moderation Alerts Pack requires MyAlerts to be installed in order to properly work.", "error");
 		admin_redirect("index.php?module=config-plugins");
 	}
 	
 	$PL or require_once PLUGINLIBRARY;
-	
-<<<<<<< HEAD
-    $info = myalertsmore_info();
-    $shadePlugins = $cache->read('shade_plugins');
-    $shadePlugins[$info['name']] = array(
-        'title' => $info['name'],
-        'version' => $info['version']
-    );
-    $cache->update('shade_plugins', $shadePlugins);
-=======
 	$info = myalertsmore_info();
 	$shadePlugins = $cache->read('shade_plugins');
 	$shadePlugins[$info['name']] = array(
@@ -106,7 +70,6 @@ function myalertsmore_install()
 		'version' => $info['version']
 	);
 	$cache->update('shade_plugins', $shadePlugins);
->>>>>>> 1.1-dev
 	
 	// add extra hooks - needed for some alerts
 	$PL->edit_core('myalertsmore', 'warnings.php', array(
@@ -287,11 +250,7 @@ function myalertsmore_install()
 		"optionscode" => "yesno",
 		"value" => "1",
 		"disporder" => "29",
-<<<<<<< HEAD
-		"gid" => $gid,
-=======
 		"gid" => $gid
->>>>>>> 1.1-dev
 	);
 	$myalertsmore_settings_11 = array(
 		"name" => "myalerts_alert_suspendsignature",
@@ -300,11 +259,7 @@ function myalertsmore_install()
 		"optionscode" => "yesno",
 		"value" => "1",
 		"disporder" => "30",
-<<<<<<< HEAD
-		"gid" => $gid,
-=======
 		"gid" => $gid
->>>>>>> 1.1-dev
 	);
 	$db->insert_query("settings", $myalertsmore_settings_1);
 	$db->insert_query("settings", $myalertsmore_settings_2);
@@ -319,62 +274,6 @@ function myalertsmore_install()
 	$db->insert_query("settings", $myalertsmore_settings_11);
 	
 	$insertArray = array(
-<<<<<<< HEAD
-        0 => array(
-            'code' => 'warn',
-        ),
-        1 => array(
-            'code' => 'revokewarn',
-        ),
-        2 => array(
-            'code' => 'multideletethreads',
-        ),
-        3 => array(
-            'code' => 'multiclosethreads',
-        ),
-        4 => array(
-            'code' => 'multiopenthreads',
-        ),
-        5 => array(
-            'code' => 'multimovethreads',
-        ),
-        6 => array(
-            'code' => 'editpost',
-        ),
-        7 => array(
-            'code' => 'multideleteposts',
-        ),
-        8 => array(
-            'code' => 'suspendposting',
-        ),
-        9 => array(
-            'code' => 'moderateposting',
-        ),
-        10 => array(
-            'code' => 'suspendsignature',
-        )
-    );
-
-    $db->insert_query_multiple('alert_settings', $insertArray);
-	
-	$query = $db->simple_select('alert_settings', '*', 'setting_id > 5');
-	$query = $db->simple_select('users', 'uid');
-	
-	$userSettings = array();
-	foreach ($db->fetch_array($query) as $uid) {
-		foreach ($ucpArray as $setting) {
-			$userSettings[] = array(
-            	'user_id'    => (int) $uid,
-            	'setting_id' => $setting,
-            	'value'      => 1,
-			);
-		}
-	}
-	
-	$db->insert_query_multiple('alert_setting_values', $userSettings);
-	
-	rebuild_settings();
-=======
 		0 => array(
 			'code' => 'warn'
 		),
@@ -416,7 +315,6 @@ function myalertsmore_install()
 	while ($uids = $db->fetch_array($query)) {
 		$users[] = $uids['uid'];
 	}
->>>>>>> 1.1-dev
 
 	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
 	while ($setting = $db->fetch_array($query)) {
@@ -451,28 +349,6 @@ function myalertsmore_uninstall()
 	$PL or require_once PLUGINLIBRARY;
 	
 	// restore core edits we've done in installation process
-<<<<<<< HEAD
-	$PL->edit_core('myalertsmore', 'warnings.php',
-               array(),
-               true);
-	$PL->edit_core('myalertsmore', 'moderation.php',
-               array(),
-               true);
-	$PL->edit_core('myalertsmore', 'xmlhttp.php',
-               array(),
-               true);
-	$PL->edit_core('myalertsmore', 'editpost.php',
-               array(),
-               true);
-			   	
-	$db->write_query("DELETE FROM ".TABLE_PREFIX."settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature')");
-	
-	$info = myalertsmore_info();
-    // delete the plugin from cache
-    $shadePlugins = $cache->read('shade_plugins');
-    unset($shadePlugins[$info['name']]);
-    $cache->update('shade_plugins', $shadePlugins);
-=======
 	$PL->edit_core('myalertsmore', 'warnings.php', array(), true);
 	$PL->edit_core('myalertsmore', 'moderation.php', array(), true);
 	$PL->edit_core('myalertsmore', 'xmlhttp.php', array(), true);
@@ -498,7 +374,6 @@ function myalertsmore_uninstall()
 	$shadePlugins = $cache->read('shade_plugins');
 	unset($shadePlugins[$info['name']]);
 	$cache->update('shade_plugins', $shadePlugins);
->>>>>>> 1.1-dev
 	// rebuild settings
 	rebuild_settings();
 }
