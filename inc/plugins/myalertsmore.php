@@ -21,14 +21,14 @@ if (!defined("PLUGINLIBRARY")) {
 function myalertsmore_info()
 {
 	return array(
-		'name' => 'Moderation Alerts Pack',
-		'description' => 'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
-		'website' => 'http://www.idevicelab.net/forum',
-		'author' => 'Shade',
-		'authorsite' => 'http://www.idevicelab.net/forum',
-		'version' => '1.0.4',
-		'compatibility' => '16*',
-		'guid' => '9f724627ed35cb4a41ee5453f09ee384'
+		'name'			=>	'Moderation Alerts Pack',
+		'description'	=>	'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
+		'website'		=>	'https://github.com/MyAlerts/Moderation-Alerts-Pack',
+		'author'		=>	'Shade',
+		'authorsite'	=>	'http://www.idevicelab.net/forum',
+		'version'		=>	'1.0.4',
+		'compatibility'	=>	'16*',
+		'guid'			=>	'9f724627ed35cb4a41ee5453f09ee384'
 	);
 }
 
@@ -62,8 +62,8 @@ function myalertsmore_install()
 	$info = myalertsmore_info();
 	$shadePlugins = $cache->read('shade_plugins');
 	$shadePlugins[$info['name']] = array(
-		'title' => $info['name'],
-		'version' => $info['version']
+		'title'		=>	$info['name'],
+		'version'	=>	$info['version']
 	);
 	$cache->update('shade_plugins', $shadePlugins);
 	
@@ -151,6 +151,14 @@ function myalertsmore_install()
 		)
 	), true);
 	
+	$PL->edit_core('myalertsmore', 'inc/datahandlers/user.php', array(
+		// change username alert
+		array(
+			'search' => '$plugins->run_hooks("datahandler_user_update", $this);',
+			'after' => '$plugins->run_hooks("datahandlers_user_update_user");'
+		)
+	), true);
+	
 	if (!$lang->myalertsmore) {
 		$lang->load('myalertsmore');
 	}
@@ -158,116 +166,103 @@ function myalertsmore_install()
 	$query = $db->simple_select("settinggroups", "gid", "name='myalerts'");
 	$gid = intval($db->fetch_field($query, "gid"));
 	
-	$myalertsmore_settings_1 = array(
-		"name" => "myalerts_alert_warn",
+	$myalertsmore_settings = array();
+	
+	$myalertsmore_settings[] = array(
+		"name" => "warn",
 		"title" => $lang->setting_myalertsmore_alert_warn,
 		"description" => $lang->setting_myalertsmore_alert_warn_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "20",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_2 = array(
-		"name" => "myalerts_alert_revokewarn",
+	$myalertsmore_settings[] = array(
+		"name" => "revokewarn",
 		"title" => $lang->setting_myalertsmore_alert_revokewarn,
 		"description" => $lang->setting_myalertsmore_alert_revokewarn_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "21",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_3 = array(
-		"name" => "myalerts_alert_multideletethreads",
+	$myalertsmore_settings[] = array(
+		"name" => "multideletethreads",
 		"title" => $lang->setting_myalertsmore_alert_multideletethreads,
 		"description" => $lang->setting_myalertsmore_alert_multideletethreads_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "22",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_4 = array(
-		"name" => "myalerts_alert_multiclosethreads",
+	$myalertsmore_settings[] = array(
+		"name" => "multiclosethreads",
 		"title" => $lang->setting_myalertsmore_alert_multiclosethreads,
 		"description" => $lang->setting_myalertsmore_alert_multiclosethreads_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "23",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_5 = array(
-		"name" => "myalerts_alert_multiopenthreads",
+	$myalertsmore_settings[] = array(
+		"name" => "multiopenthreads",
 		"title" => $lang->setting_myalertsmore_alert_multiopenthreads,
 		"description" => $lang->setting_myalertsmore_alert_multiopenthreads_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "24",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_6 = array(
-		"name" => "myalerts_alert_multimovethreads",
+	$myalertsmore_settings[] = array(
+		"name" => "multimovethreads",
 		"title" => $lang->setting_myalertsmore_alert_multimovethreads,
 		"description" => $lang->setting_myalertsmore_alert_multimovethreads_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "25",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_7 = array(
-		"name" => "myalerts_alert_editpost",
+	$myalertsmore_settings[] = array(
+		"name" => "editpost",
 		"title" => $lang->setting_myalertsmore_alert_editpost,
 		"description" => $lang->setting_myalertsmore_alert_editpost_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "26",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_8 = array(
-		"name" => "myalerts_alert_multideleteposts",
+	$myalertsmore_settings[] = array(
+		"name" => "multideleteposts",
 		"title" => $lang->setting_myalertsmore_alert_multideleteposts,
 		"description" => $lang->setting_myalertsmore_alert_multideleteposts_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "27",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_9 = array(
-		"name" => "myalerts_alert_suspendposting",
+	$myalertsmore_settings[] = array(
+		"name" => "suspendposting",
 		"title" => $lang->setting_myalertsmore_alert_suspendposting,
 		"description" => $lang->setting_myalertsmore_alert_suspendposting_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "28",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_10 = array(
-		"name" => "myalerts_alert_moderateposting",
+	$myalertsmore_settings[] = array(
+		"name" => "moderateposting",
 		"title" => $lang->setting_myalertsmore_alert_moderateposting,
 		"description" => $lang->setting_myalertsmore_alert_moderateposting_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "29",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$myalertsmore_settings_11 = array(
-		"name" => "myalerts_alert_suspendsignature",
+	$myalertsmore_settings[] = array(
+		"name" => "suspendsignature",
 		"title" => $lang->setting_myalertsmore_alert_suspendsignature,
 		"description" => $lang->setting_myalertsmore_alert_suspendsignature_desc,
 		"optionscode" => "yesno",
-		"value" => "1",
-		"disporder" => "30",
-		"gid" => $gid
+		"value" => "1"
 	);
-	$db->insert_query("settings", $myalertsmore_settings_1);
-	$db->insert_query("settings", $myalertsmore_settings_2);
-	$db->insert_query("settings", $myalertsmore_settings_3);
-	$db->insert_query("settings", $myalertsmore_settings_4);
-	$db->insert_query("settings", $myalertsmore_settings_5);
-	$db->insert_query("settings", $myalertsmore_settings_6);
-	$db->insert_query("settings", $myalertsmore_settings_7);
-	$db->insert_query("settings", $myalertsmore_settings_8);
-	$db->insert_query("settings", $myalertsmore_settings_9);
-	$db->insert_query("settings", $myalertsmore_settings_10);
-	$db->insert_query("settings", $myalertsmore_settings_11);
+	$myalertsmore_settings[] = array(
+		"name" => "changeusername",
+		"title" => $lang->setting_myalertsmore_alert_changeusername,
+		"description" => $lang->setting_myalertsmore_alert_changeusername_desc,
+		"optionscode" => "yesno",
+		"value" => "1"
+	);
+	
+	$i = 20;
+	foreach($myalertsmore_settings as $setting)
+	{
+		$setting['name'] = "myalerts_alert_".$setting['name'];
+		$setting['disporder'] = $i;
+		$setting['gid'] = $gid;
+		
+		$db->insert_query("settings", $setting);
+		$i++;
+	}
 	
 	$insertArray = array(
 		0 => array(
@@ -312,7 +307,7 @@ function myalertsmore_install()
 		$users[] = $uids['uid'];
 	}
 	
-	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature', 'changeusername')");
 	while ($setting = $db->fetch_array($query)) {
 		$settings[] = $setting['id'];
 	}
@@ -351,10 +346,10 @@ function myalertsmore_uninstall()
 	$PL->edit_core('myalertsmore', 'editpost.php', array(), true);
 	
 	// delete ACP settings
-	$db->write_query("DELETE FROM " . TABLE_PREFIX . "settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature')");
+	$db->write_query("DELETE FROM " . TABLE_PREFIX . "settings WHERE name IN('myalerts_alert_warn','myalerts_alert_revokewarn','myalerts_alert_multideletethreads','myalerts_alert_multiclosethreads','myalerts_alert_multiopenthreads','myalerts_alert_multimovethreads','myalerts_alert_editpost','myalerts_alert_multideleteposts','myalerts_alert_suspendposting','myalerts_alert_moderateposting','myalerts_alert_suspendsignature','myalerts_alert_changeusername')");
 	
 	// delete existing values
-	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+	$query = $db->simple_select("alert_settings", "id", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature', 'changeusername')");
 	while ($setting = $db->fetch_array($query)) {
 		$settings[] = $setting['id'];
 	}
@@ -363,7 +358,7 @@ function myalertsmore_uninstall()
 	// truly delete them
 	$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");
 	// delete UCP settings
-	$db->delete_query("alert_settings", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature')");
+	$db->delete_query("alert_settings", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature', 'changeusername')");
 	
 	$info = myalertsmore_info();
 	// delete the plugin from cache
@@ -489,6 +484,12 @@ function myalertsmore_parseAlerts(&$alert)
 			}
 			$alert['message'] = $lang->sprintf($lang->myalertsmore_suspendsignature, $alert['user'], $alert['expiryDate'], $alert['dateline']);
 			$alert['rowType'] = 'suspendsignatureAlert';
+		}
+	}
+	// change username
+		elseif ($alert['alert_type'] == 'changeusername' AND $mybb->user['myalerts_settings']['changeusername']) {
+			$alert['message'] = $lang->sprintf($lang->myalertsmore_changeusername, $alert['user'], $alert['content']['oldName'], $alert['content']['newName'], $alert['dateline']);
+			$alert['rowType'] = 'changeusernameAlert';
 		}
 	}
 }
@@ -803,3 +804,21 @@ function myalertsmore_addAlert_suspensions()
 		));
 	}
 }
+
+// CHANGE USERNAME
+if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_changeusername']) {
+	$plugins->add_hook('datahandlers_user_update_user_start', 'myalertsmore_addAlert_changeusername');
+}
+function myalertsmore_addAlert_changeusername()
+{
+	global $mybb, $Alerts, $user, $old_user;
+	
+	if(isset($user['username']) && $mybb->user['uid'] != $user['uid'])
+	{
+		$Alerts->addAlert((int) $user['uid'], 'changeusername', 0, (int) $mybb->user['uid'], array(
+			'oldName' => $old_user['username'],
+			'newName' => $user['username']
+		));
+	}
+}
+?>
