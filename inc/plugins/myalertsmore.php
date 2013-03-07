@@ -155,7 +155,7 @@ function myalertsmore_install()
 		// change username alert
 		array(
 			'search' => '$plugins->run_hooks("datahandler_user_update", $this);',
-			'after' => '$plugins->run_hooks("datahandlers_user_update_user");'
+			'after' => '$plugins->run_hooks("datahandler_user_update_user");'
 		)
 	), true);
 	
@@ -807,7 +807,7 @@ function myalertsmore_addAlert_suspensions()
 
 // CHANGE USERNAME
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_changeusername']) {
-	$plugins->add_hook('datahandlers_user_update_user_start', 'myalertsmore_addAlert_changeusername');
+	$plugins->add_hook('datahandler_user_update_user', 'myalertsmore_addAlert_changeusername');
 }
 function myalertsmore_addAlert_changeusername()
 {
