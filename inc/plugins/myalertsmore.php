@@ -487,10 +487,9 @@ function myalertsmore_parseAlerts(&$alert)
 		}
 	}
 	// change username
-		elseif ($alert['alert_type'] == 'changeusername' AND $mybb->user['myalerts_settings']['changeusername']) {
-			$alert['message'] = $lang->sprintf($lang->myalertsmore_changeusername, $alert['user'], $alert['content']['oldName'], $alert['content']['newName'], $alert['dateline']);
-			$alert['rowType'] = 'changeusernameAlert';
-		}
+	elseif ($alert['alert_type'] == 'changeusername' AND $mybb->user['myalerts_settings']['changeusername']) {
+		$alert['message'] = $lang->sprintf($lang->myalertsmore_changeusername, $alert['user'], $alert['content']['oldName'], $alert['content']['newName'], $alert['dateline']);
+		$alert['rowType'] = 'changeusernameAlert';
 	}
 }
 
