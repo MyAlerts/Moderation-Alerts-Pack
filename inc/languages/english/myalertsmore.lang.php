@@ -12,7 +12,7 @@ $l['myalerts_setting_multideleteposts'] = "Receive alert when a Team member dele
 $l['myalerts_setting_suspendposting'] = "Receive alert when a Team member suspends or unsuspends you from posting?";
 $l['myalerts_setting_moderateposting'] = "Receive alert when a Team member sets or unsets your posts to be moderated?";
 $l['myalerts_setting_suspendsignature'] = "Receive alert when a Team member suspends or unsuspends your signature?";
-$l['myalerts_setting_usernamechange'] = "Receive alert when a Team member changes your username?";
+$l['myalerts_setting_changeusername'] = "Receive alert when a Team member changes your username?";
 // our custom stuff
 $l['myalertsmore_warn'] = "{1} warned you with {2} warning points. ({3}) (Expires: {4})";
 $l['myalertsmore_revokewarn'] = "{1} revoked you a warning removing {2} points. ({3})";

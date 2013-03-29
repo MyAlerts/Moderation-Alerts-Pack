@@ -22,5 +22,5 @@ $l['setting_myalertsmore_alert_moderateposting_desc'] = "Do you wish for users t
 $l['setting_myalertsmore_alert_suspendsignature'] = "Alert on signature suspension or unsuspension?";
 $l['setting_myalertsmore_alert_suspendsignature_desc'] = "Do you wish for users to receive a new alert when you suspend/unsuspend their signatures?";
 $l['setting_myalertsmore_alert_changeusername'] = "Alert on username change?";
-$l['setting_myalertsmore_alert_changeusername_desc'] = "Do you wish for users to receive a new alert when their username is changed by a moderator other than themselves.";
+$l['setting_myalertsmore_alert_changeusername_desc'] = "Do you wish for users to receive a new alert when their username is changed by a Team member?";
 ?>
