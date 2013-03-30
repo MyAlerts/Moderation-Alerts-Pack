@@ -81,42 +81,6 @@ function myalertsmore_install()
 		)
 	), true);
 	
-	$PL->edit_core('myalertsmore', 'editpost.php', array(
-		// delete thread if firstpost
-		array(
-			'search' => 'delete_thread($tid);',
-			'after' => '$plugins->run_hooks("editpost_delete_thread_firstpost");'
-		),
-		// delete single post
-		array(
-			'search' => 'delete_post($pid, $tid);',
-			'after' => '$plugins->run_hooks("editpost_deletesinglepost");'
-		)
-	), true);
-	
-	$PL->edit_core('myalertsmore', 'moderation.php', array(
-		// move multiple threads alert
-		array(
-			'search' => '$moderation->move_threads($tids, $moveto);',
-			'after' => '$plugins->run_hooks("moderation_multimovethreads");'
-		),
-		// move single thread alert
-		array(
-			'search' => 'moderation_redirect(get_thread_link($newtid), $lang->redirect_threadmoved);',
-			'before' => '$plugins->run_hooks("moderation_movesinglethread");'
-		),
-		// delete posts
-		array(
-			'search' => '$moderation->delete_post($pid);',
-			'after' => '$plugins->run_hooks("moderation_multideleteposts");'
-		),
-		// delete posts
-		array(
-			'search' => '$moderation->delete_post($post[\'pid\']);',
-			'after' => '$plugins->run_hooks("moderation_multideleteposts");'
-		)
-	), true);
-	
 	$PL->edit_core('myalertsmore', 'xmlhttp.php', array(
 		// quick edit alert
 		array(
@@ -131,6 +95,39 @@ function myalertsmore_install()
 			'search' => '$plugins->run_hooks("class_moderation_delete_thread", $tid);',
 			'after' => '$args = array("thread" => &$thread);
 $plugins->run_hooks("class_moderation_delete_thread_custom", $args);'
+		),
+		// move single thread
+		array(
+			'search' => '$arguments = array("tid" => $tid, "new_fid" => $new_fid);',
+			'after' => '$arguments = array_merge($arguments, array("newforum" => &$newforum, "thread" => &$thread));',
+			'multi' => true
+		),
+		// move multiple threads, inline moderation
+		array(
+			'search' => '$arguments = array("tids" => $tids, "moveto" => $moveto);',
+			'after' => '$arguments["newforum"] = &$newforum;'
+		),
+		// delete post
+		array(
+			'search' => '$query = $db->query("
+			SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible
+			FROM ".TABLE_PREFIX."posts p
+			LEFT JOIN ".TABLE_PREFIX."threads t ON (t.tid=p.tid)
+			LEFT JOIN ".TABLE_PREFIX."forums f ON (f.fid=p.fid)
+			WHERE p.pid=\'$pid\'
+		");',
+			'replace' => '$query = $db->query("
+			SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible, t.subject
+			FROM ".TABLE_PREFIX."posts p
+			LEFT JOIN ".TABLE_PREFIX."threads t ON (t.tid=p.tid)
+			LEFT JOIN ".TABLE_PREFIX."forums f ON (f.fid=p.fid)
+			WHERE p.pid=\'$pid\'
+		");'
+		),
+		array(
+			'search' => '$plugins->run_hooks("class_moderation_delete_post", $post[\'pid\']);',
+			'after' => '$args = array("post" => &$post);
+$plugins->run_hooks("class_moderation_delete_post_custom", $args);'
 		)
 	), true);
 	
@@ -328,9 +325,7 @@ function myalertsmore_uninstall()
 	
 	// restore core edits we've done in installation process
 	$PL->edit_core('myalertsmore', 'warnings.php', array(), true);
-	$PL->edit_core('myalertsmore', 'moderation.php', array(), true);
 	$PL->edit_core('myalertsmore', 'xmlhttp.php', array(), true);
-	$PL->edit_core('myalertsmore', 'editpost.php', array(), true);
 	$PL->edit_core('myalertsmore', 'inc/class_moderation.php', array(), true);
 	$PL->edit_core('myalertsmore', 'inc/datahandlers/user.php', array(), true);
 	
@@ -542,7 +537,7 @@ function myalertsmore_addAlert_closethreads($tids)
 	foreach ($tids as $tid) {
 		$thread = get_thread($tid);
 		if ($mybb->user['uid'] != $thread['uid']) {
-			// we only want to notify the thread's author when the thread is being closed but it must be opened. Mods can close threads already closed accidentally, so just check if thread is not already closed and if it is, notify the user
+			// we only want to notify the thread's author when the thread is being closed but it must be opened. Mods can close threads already closed accidentally, so just check if thread is not already closed and if it passes the check, notify the user
 			if ($thread['closed'] != 1) {
 				$Alerts->addAlert((int) $thread['uid'], 'multiclosethreads', (int) $thread['tid'], (int) $mybb->user['uid'], array(
 					'subject' => $thread['subject'],
@@ -565,7 +560,7 @@ function myalertsmore_addAlert_openthreads($tids)
 	foreach ($tids as $tid) {
 		$thread = get_thread($tid);
 		if ($mybb->user['uid'] != $thread['uid']) {
-			// we only want to notify the thread's author when the thread is being closed but it must be opened. Mods can close threads already closed accidentally, so just check if thread is not already closed and if it is, notify the user
+			// we only want to notify the thread's author when the thread is being opened but it must be closed. Mods can open threads already opened accidentally, so just check if thread is not already opened and if it passes the check, notify the user
 			if ($thread['closed'] == 1) {
 				$Alerts->addAlert((int) $thread['uid'], 'multiopenthreads', (int) $thread['tid'], (int) $mybb->user['uid'], array(
 					'subject' => $thread['subject'],
@@ -577,41 +572,18 @@ function myalertsmore_addAlert_openthreads($tids)
 }
 
 
-// MOVE MULTIPLE THREADS & SINGLE THREAD
+// MOVE ANY KIND OF THREAD
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multimovethreads']) {
-	$plugins->add_hook('moderation_multimovethreads', 'myalertsmore_addAlert_multimovethreads');
-	$plugins->add_hook('moderation_movesinglethread', 'myalertsmore_addAlert_movesinglethread');
+	$plugins->add_hook('class_moderation_move_simple', 'myalertsmore_addAlert_move_simple');
+	$plugins->add_hook('class_moderation_move_threads', 'myalertsmore_addAlert_move_threads');
 }
-// multiple threads
-function myalertsmore_addAlert_multimovethreads()
+function myalertsmore_addAlert_move_simple(&$arguments)
 {
-	global $mybb, $Alerts, $tids, $newforum;
+	global $mybb, $Alerts;
 	
-	// some optimizations to keep a low # of queries. Since threads are moved in the same forum, we can generate its link immediately, saving a lot of queries. The forum's name is already stored into $newforum array, we don't need to query more over
+	$newforum = $arguments['newforum'];
 	$forumLink = get_forum_link($newforum['fid']);
-	// multiple threads tid stored in $tids array, loop alert execution
-	foreach ($tids as $tid) {
-		// get single thread data
-		$thread = get_thread($tid);
-		// moderators are the only actual users allowed to move threads. But if the thread they're moving belongs to themselves, then it's annoying. Check this out and react depending on the situation.
-		if ($mybb->user['uid'] != $thread['uid']) {
-			$Alerts->addAlert((int) $thread['uid'], 'multimovethreads', (int) $thread['tid'], (int) $mybb->user['uid'], array(
-				'subject' => $thread['subject'],
-				'tid' => $thread['tid'],
-				'forumName' => $newforum['name'],
-				'forumLink' => $forumLink
-			));
-		}
-	}
-}
-// single thread
-function myalertsmore_addAlert_movesinglethread()
-{
-	global $mybb, $Alerts, $newtid, $newforum;
-	
-	// see multiple threads moving above...
-	$forumLink = get_forum_link($newforum['fid']);
-	$thread = get_thread($newtid);
+	$thread = $arguments['thread'];
 	// moderators are the only actual users allowed to move threads. But if the thread they're moving belongs to themselves, then it's annoying. Check this out and react depending on the situation.
 	if ($mybb->user['uid'] != $thread['uid']) {
 		$Alerts->addAlert((int) $thread['uid'], 'multimovethreads', (int) $thread['tid'], (int) $mybb->user['uid'], array(
@@ -620,6 +592,25 @@ function myalertsmore_addAlert_movesinglethread()
 			'forumName' => $newforum['name'],
 			'forumLink' => $forumLink
 		));
+	}
+}
+// inline moderation
+function myalertsmore_addAlert_move_threads(&$arguments)
+{
+	global $mybb, $Alerts;
+	
+	$newforum = $arguments['newforum'];
+	$forumLink = get_forum_link($newforum['fid']);
+	foreach ($arguments['tids'] as $tid) {
+		$thread = get_thread($tid);
+		if ($mybb->user['uid'] != $thread['uid']) {
+			$Alerts->addAlert((int) $thread['uid'], 'multimovethreads', (int) $thread['tid'], (int) $mybb->user['uid'], array(
+				'subject' => $thread['subject'],
+				'tid' => $thread['tid'],
+				'forumName' => $newforum['name'],
+				'forumLink' => $forumLink
+			));
+		}
 	}
 }
 
@@ -660,27 +651,22 @@ function myalertsmore_addAlert_editpost_quick()
 }
 
 
-// DELETE POSTS, SINGLE AND MULTIPLE
+// DELETE ANY KIND OF POST
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_multideleteposts']) {
-	$plugins->add_hook('moderation_multideleteposts', 'myalertsmore_addAlert_multideleteposts');
-	$plugins->add_hook('editpost_deletesinglepost', 'myalertsmore_addAlert_multideleteposts');
+	$plugins->add_hook('class_moderation_delete_post_custom', 'myalertsmore_addAlert_delete_post');
 }
-function myalertsmore_addAlert_multideleteposts()
+function myalertsmore_addAlert_delete_post(&$args)
 {
-	global $mybb, $Alerts, $post, $tid, $pid;
+	global $mybb, $Alerts;
 	
-	// there are a lot of queries here. If someone knows a better way to handle this, we need to know tid, thread link and thread name. Help is appreciated.
-	$post = get_post($pid);
-	$tid = $post['tid'];
+	$post = $args['post'];
+	$threadUrl = get_thread_link($post['tid']);
 	
-	$threadUrl = get_thread_link($tid);
-	$threadInfo = get_thread($tid);
-	
-	// check if post belongs to the user itself. Is it not? Then alert the user!
+	// check if post belongs to the user itself. Is doesn't? Then alert the user!
 	if ($post['uid'] != $mybb->user['uid']) {
-		$Alerts->addAlert((int) $post['uid'], 'multideleteposts', (int) $tid, (int) $mybb->user['uid'], array(
+		$Alerts->addAlert((int) $post['uid'], 'multideleteposts', (int) $post['tid'], (int) $mybb->user['uid'], array(
 			'threadUrl' => $threadUrl,
-			'threadName' => $threadInfo['subject']
+			'threadName' => $post['subject']
 		));
 	}
 }
