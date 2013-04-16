@@ -7,7 +7,7 @@
  * @package Moderation Alerts Pack
  * @author  Shade <legend_k@live.it>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.0.4
+ * @version 1.1
  */
 
 if (!defined('IN_MYBB')) {
@@ -26,7 +26,7 @@ function myalertsmore_info()
 		'website'		=>	'https://github.com/MyAlerts/Moderation-Alerts-Pack',
 		'author'		=>	'Shade',
 		'authorsite'	=>	'http://www.idevicelab.net/forum',
-		'version'		=>	'1.0.4',
+		'version'		=>	'1.1',
 		'compatibility'	=>	'16*',
 		'guid'			=>	'9f724627ed35cb4a41ee5453f09ee384'
 	);
@@ -730,6 +730,7 @@ function myalertsmore_addAlert_suspensions()
 		));
 	}
 }
+
 
 // CHANGE USERNAME
 if ($settings['myalerts_enabled'] AND $settings['myalerts_alert_changeusername']) {
