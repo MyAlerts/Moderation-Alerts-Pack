@@ -145,7 +145,7 @@ $plugins->run_hooks("datahandler_user_update_user", $args);'
 	}
 	
 	$query = $db->simple_select("settinggroups", "gid", "name='myalerts'");
-	$gid = intval($db->fetch_field($query, "gid"));
+	$gid = (int) $db->fetch_field($query, "gid");
 	
 	$myalertsmore_settings = array();
 	
@@ -340,7 +340,9 @@ function myalertsmore_uninstall()
 	$settings = implode(",", $settings);
 	
 	// truly delete them
-	$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");
+	if(!empty($settings)) {
+		$db->delete_query("alert_setting_values", "setting_id IN ({$settings})");
+	}
 	// delete UCP settings
 	$db->delete_query("alert_settings", "code IN ('warn', 'revokewarn', 'multideletethreads', 'multiclosethreads', 'multiopenthreads', 'multimovethreads', 'editpost', 'multideleteposts', 'suspendposting', 'moderateposting', 'suspendsignature', 'changeusername')");
 	
