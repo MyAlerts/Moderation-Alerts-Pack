@@ -1,4 +1,16 @@
 <?php
+/**
+ * Moderation Alerts Pack
+ * 
+ * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
+ *
+ * @package Moderation Alerts Pack
+ * @author  Shade <legend_k@live.it>
+ * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
+ * @version 1.1
+ */
+
+// Settings
 $l['setting_myalertsmore_alert_warn'] = "Alert on warning?";
 $l['setting_myalertsmore_alert_warn_desc'] = "Do you wish for users to receive a new alert when an user is warned?";
 $l['setting_myalertsmore_alert_revokewarn'] = "Alert on warning revoke?";

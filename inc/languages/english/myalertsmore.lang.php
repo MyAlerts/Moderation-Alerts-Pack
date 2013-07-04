@@ -1,6 +1,20 @@
 <?php
+/**
+ * Moderation Alerts Pack
+ * 
+ * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
+ *
+ * @package Moderation Alerts Pack
+ * @author  Shade <legend_k@live.it>
+ * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
+ * @version 1.1
+ */
+
+
+// Misc
 $l['myalertsmore'] = "Moderation Alerts Pack";
-// usercp stuff MyAlerts itself loads
+
+// Usercp stuff MyAlerts itself loads
 $l['myalerts_setting_warn'] = "Receive alert when you're warned by a Team member?";
 $l['myalerts_setting_revokewarn'] = "Receive alert when a Team member revokes any of your active warnings?";
 $l['myalerts_setting_multideletethreads'] = "Receive alert when a Team member deletes any of your threads?";
@@ -13,7 +27,8 @@ $l['myalerts_setting_suspendposting'] = "Receive alert when a Team member suspen
 $l['myalerts_setting_moderateposting'] = "Receive alert when a Team member sets or unsets your posts to be moderated?";
 $l['myalerts_setting_suspendsignature'] = "Receive alert when a Team member suspends or unsuspends your signature?";
 $l['myalerts_setting_changeusername'] = "Receive alert when a Team member changes your username?";
-// our custom stuff
+
+// Our custom stuff
 $l['myalertsmore_warn'] = "{1} warned you with {2} warning points. ({3}) (Expires: {4})";
 $l['myalertsmore_revokewarn'] = "{1} revoked you a warning removing {2} points. ({3})";
 $l['myalertsmore_multideletethreads'] = "{1} deleted your thread \"{2}\". ({3})";
@@ -30,6 +45,6 @@ $l['myalertsmore_suspendsignature'] = "{1} suspended your signature ({3}) (Expir
 $l['myalertsmore_unsuspendsignature'] = "{1} unsuspended your signature which is viewable again. ({2})";
 $l['myalertsmore_changeusername'] = "{1} changed your username from \"{2}\" to \"{3}\".";
 
-// even more custom stuff - some alerts need this
+// Even more custom stuff - some alerts need this
 $l['myalertsmore_expire_never'] = "Never";
 ?>
