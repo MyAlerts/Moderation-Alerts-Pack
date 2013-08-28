@@ -1,20 +1,6 @@
 <?php
-/**
- * Moderation Alerts Pack
- * 
- * Provides additional actions related to moderation for @euantor's MyAlerts plugin.
- *
- * @package Moderation Alerts Pack
- * @author  Shade <legend_k@live.it>
- * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 1.1
- */
-
-
-// Misc
 $l['myalertsmore'] = "Moderation Alerts Pack";
-
-// Usercp stuff MyAlerts itself loads
+// usercp stuff MyAlerts loads itself
 $l['myalerts_setting_warn'] = "Receive alert when you're warned by a Team member?";
 $l['myalerts_setting_revokewarn'] = "Receive alert when a Team member revokes any of your active warnings?";
 $l['myalerts_setting_multideletethreads'] = "Receive alert when a Team member deletes any of your threads?";
@@ -27,8 +13,10 @@ $l['myalerts_setting_suspendposting'] = "Receive alert when a Team member suspen
 $l['myalerts_setting_moderateposting'] = "Receive alert when a Team member sets or unsets your posts to be moderated?";
 $l['myalerts_setting_suspendsignature'] = "Receive alert when a Team member suspends or unsuspends your signature?";
 $l['myalerts_setting_changeusername'] = "Receive alert when a Team member changes your username?";
-
-// Our custom stuff
+$l['myalerts_setting_changesignature'] = "Receive alert when a Team member changes your signature?";
+$l['myalerts_setting_approvethreads'] = "Receive alert when a Team member approves any of your threads?";
+$l['myalerts_setting_unapprovethreads'] = "Receive alert when a Team member unapproves any of your threads?";
+// our custom stuff
 $l['myalertsmore_warn'] = "{1} warned you with {2} warning points. ({3}) (Expires: {4})";
 $l['myalertsmore_revokewarn'] = "{1} revoked you a warning removing {2} points. ({3})";
 $l['myalertsmore_multideletethreads'] = "{1} deleted your thread \"{2}\". ({3})";
@@ -42,9 +30,11 @@ $l['myalertsmore_unsuspendposting'] = "{1} unsuspended you from posting. You are
 $l['myalertsmore_moderateposting'] = "{1} set your posts to be moderated ({3}) (Expires: {2})";
 $l['myalertsmore_unmoderateposting'] = "{1} unset your posts to be moderated. You can now post without being moderated. ({2})";
 $l['myalertsmore_suspendsignature'] = "{1} suspended your signature ({3}) (Expires: {2})";
-$l['myalertsmore_unsuspendsignature'] = "{1} unsuspended your signature which is viewable again. ({2})";
-$l['myalertsmore_changeusername'] = "{1} changed your username from \"{2}\" to \"{3}\".";
+$l['myalertsmore_unsuspendsignature'] = "{1} unsuspended your signature and it's viewable again. ({2})";
+$l['myalertsmore_changeusername'] = "{1} changed your username from \"{2}\" to \"{3}\". ({4})";
+$l['myalertsmore_changesignature'] = "{1} changed your signature. <a href=\"{2}\">Check it out</a>. ({3})";
+$l['myalertsmore_approvethreads'] = "{1} approved your thread \"<a href=\"{4}\">{2}</a>\". ({3})";
+$l['myalertsmore_unapprovethreads'] = "{1} unapproved your thread \"{2}\". ({3})";
 
-// Even more custom stuff - some alerts need this
+// even more custom stuff - some alerts need this
 $l['myalertsmore_expire_never'] = "Never";
-?>
