@@ -1,22 +1,22 @@
 Moderation Alerts Pack
 ===============================
 
-> **Current version** 1.1  
-> **Dependencies** MyAlerts 1.04 or higher, available to download [here][1], and [PluginLibrary][2], which is required to install MyAlerts  
+> **Current version** 2.0  
+> **Dependencies** MyAlerts 1.04 or above, available to download [here][1], and [PluginLibrary][2], which is required to install MyAlerts  
 > **Author** Shade  
 > **Special thanks goes to...** euantor who developed MyAlerts, the best notification plugin ever made for MyBB installations.
 
 General
 -------
 
-MyAlerts Moderation Alerts Pack is an extension made for euantor's [MyAlerts][1] plugin with the aim to add more alerts and events to be notified of.
+Moderation Alerts Pack is an extension made for euantor's [MyAlerts][1] plugin with the aim to add more alerts and events to be notified of.
 
 If you have any feature request, suggestion, or you want to report any issue, please let me know opening a new issue on GitHub. Your contribute is very important to me and helps me into making Moderation Alerts Pack more complete on every commit. 
 
 Main features
 -------------
 
-At the moment, MyAlerts Moderation Alerts Pack comes with **12 additional alerts**, but I've planned to add even more during 2013. Its settings are safely added* to existing MyAlerts settings group and updated consequently: you can obviously turn on and off them as you would do with the standard 5 alerts. You can be notified:
+At the moment, MyAlerts Moderation Alerts Pack comes with **14 additional alerts**, but I've planned to add even more throughout the years. Its settings are safely added to existing MyAlerts settings group and updated consequently: you can obviously turn on and off them as you would do with the standard 5 alerts. You can be notified:
 
 * When someone edits your posts
 * When someone deletes your posts
@@ -30,15 +30,8 @@ At the moment, MyAlerts Moderation Alerts Pack comes with **12 additional alerts
 * When someone sets/unsets your posts to be moderated
 * When someone suspends/unsuspends your signature
 * When someone edits your username
-
-Looking forward to the future
------------------------------------
-
-As I said before, I'm planning to add even more alerts to extend the plugin. The following alerts will be shortly available, not necessary in the order below:
-
-* When you're promoted to an usergroup within the core promotion system
 * When someone edits your signature
-* When someone removes your avatar
+* When someone approves/unapproves your threads
 
 [1]: http://mods.mybb.com/view/MyAlerts
 [2]: http://mods.mybb.com/view/PluginLibrary
