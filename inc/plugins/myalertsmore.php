@@ -478,9 +478,9 @@ if($settings['myalerts_enabled']) {
 		$hookslist[] = array("admin_user_users_edit_commit" => "myalertsmore_addAlert_changesignature");
 	}
 	if($settings['myalerts_alert_approvethreads'])
-		$hookslist[] = array("class_moderation_approve_thread_custom" => "myalertsmore_addAlert_approvethreads");
+		$hookslist[] = array("class_moderation_approve_thread_custom" => "myalertsmore_addAlert_togglestatus");
 	if($settings['myalerts_alert_unapprovethreads'])
-		$hookslist[] = array("class_moderation_unapprove_thread_custom" => "myalertsmore_addAlert_unapprovethreads");
+		$hookslist[] = array("class_moderation_unapprove_thread_custom" => "myalertsmore_addAlert_togglestatus");
 	// let's add these hooks
 	foreach($hookslist as $hooks) {
 		foreach($hooks as $core => $hook) {
@@ -743,29 +743,19 @@ function myalertsmore_addAlert_changesignature()
 	}
 }
 
-// APPROVE THREADS
-function myalertsmore_addAlert_approvethreads(&$args)
+// APPROVE/UNAPPROVE THREADS
+function myalertsmore_addAlert_togglestatus(&$args)
 {
 	global $mybb, $db, $Alerts;
 	
 	$thread = $args['thread'];
+	// deciding the type
+	$type = ($thread['visible'] != 1) ? 'approvethreads' : 'unapprovethreads';
+	else
+		$type = 'approve
 	if($mybb->user['uid'] != $thread['uid'])
 	{
-		$Alerts->addAlert((int) $thread['uid'], 'approvethreads', $thread['tid'], (int) $mybb->user['uid'], array(
-			'subject' => $thread['subject']
-		));
-	}
-}
-
-// UNAPPROVE THREADS
-function myalertsmore_addAlert_unapprovethreads(&$args)
-{
-	global $mybb, $db, $Alerts;
-	
-	$thread = $args['thread'];
-	if($mybb->user['uid'] != $thread['uid'])
-	{
-		$Alerts->addAlert((int) $thread['uid'], 'unapprovethreads', $thread['tid'], (int) $mybb->user['uid'], array(
+		$Alerts->addAlert((int) $thread['uid'], $type, $thread['tid'], (int) $mybb->user['uid'], array(
 			'subject' => $thread['subject']
 		));
 	}
