@@ -751,8 +751,6 @@ function myalertsmore_addAlert_togglestatus(&$args)
 	$thread = $args['thread'];
 	// deciding the type
 	$type = ($thread['visible'] != 1) ? 'approvethreads' : 'unapprovethreads';
-	else
-		$type = 'approve
 	if($mybb->user['uid'] != $thread['uid'])
 	{
 		$Alerts->addAlert((int) $thread['uid'], $type, $thread['tid'], (int) $mybb->user['uid'], array(
