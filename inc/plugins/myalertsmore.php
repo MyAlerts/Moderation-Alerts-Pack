@@ -254,20 +254,8 @@ $plugins->run_hooks("class_moderation_delete_thread_custom", $args);'
 		),
 		// delete post
 		array(
-			'search' => '$query = $db->query("
-			SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible
-			FROM ".TABLE_PREFIX."posts p
-			LEFT JOIN ".TABLE_PREFIX."threads t ON (t.tid=p.tid)
-			LEFT JOIN ".TABLE_PREFIX."forums f ON (f.fid=p.fid)
-			WHERE p.pid=\'$pid\'
-		");',
-			'replace' => '$query = $db->query("
-			SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible, t.subject
-			FROM ".TABLE_PREFIX."posts p
-			LEFT JOIN ".TABLE_PREFIX."threads t ON (t.tid=p.tid)
-			LEFT JOIN ".TABLE_PREFIX."forums f ON (f.fid=p.fid)
-			WHERE p.pid=\'$pid\'
-		");'
+			'search' => 'SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible',
+			'replace' => 'SELECT p.pid, p.uid, p.fid, p.tid, p.visible, f.usepostcounts, t.visible as threadvisible, t.subject'
 		),
 		array(
 			'search' => '$plugins->run_hooks("class_moderation_delete_post", $post[\'pid\']);',
