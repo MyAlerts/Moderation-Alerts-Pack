@@ -28,7 +28,7 @@ function myalertsmore_info()
 		'description'	=>	'Provides several more actions related to moderation for @euantor\'s <a href="http://community.mybb.com/thread-127444.html"><b>MyAlerts</b></a> plugin.<br /><span style="color:#f00">MyAlerts is required for Moderation Alerts Pack to work</span>.',
 		'website'		=>	'https://github.com/MyAlerts/Moderation-Alerts-Pack',
 		'author'		=>	'Shade',
-		'authorsite'	=>	'http://www.idevicelab.net/forum',
+		'authorsite'	=>	'',
 		'version'		=>	'2.0',
 		'compatibility'	=>	'16*',
 		'guid'			=>	'9f724627ed35cb4a41ee5453f09ee384'
