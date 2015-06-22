@@ -18,6 +18,8 @@ $l['myalerts_setting_changeusername'] = "Receive alert when a Team member change
 $l['myalerts_setting_changesignature'] = "Receive alert when a Team member changes your signature?";
 $l['myalerts_setting_approvethreads'] = "Receive alert when a Team member approves any of your threads?";
 $l['myalerts_setting_unapprovethreads'] = "Receive alert when a Team member disapproves any of your threads?";
+$l['myalerts_setting_stickthreads'] = "Receive alert when a Team member sticks any of your threads?";
+$l['myalerts_setting_unstickthreads'] = "Receive alert when a Team member unsticks any of your threads?";
 
 // Alerts
 $l['myalertsmore_warn'] = "{1} warned you with {2} warning points.{3}";
@@ -33,6 +35,8 @@ $l['myalertsmore_openthreads'] = "{1} opened your thread \"{2}\".";
 $l['myalertsmore_movethreads'] = "{1} moved your thread \"{2}\" to the forum \"{3}\".";
 $l['myalertsmore_approvethreads'] = "{1} approved your thread \"{2}\".";
 $l['myalertsmore_unapprovethreads'] = "{1} unapproved your thread \"{2}\".";
+$l['myalertsmore_stickthreads'] = "{1} sticked your thread \"{2}\".";
+$l['myalertsmore_unstickthreads'] = "{1} unsticked your thread \"{2}\".";
 $l['myalertsmore_editpost'] = "{1} edited a post you've made.";
 $l['myalertsmore_deleteposts'] = "{1} deleted a post you've made in \"{3}\".";
 $l['myalertsmore_suspensions'] = "{1} {2}{3}";
