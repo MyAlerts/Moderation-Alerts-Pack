@@ -1,10 +1,9 @@
 Moderation Alerts Pack
 ===============================
 
-> **Current version** 2.0  
-> **Dependencies** MyAlerts 1.04 or above, available to download [here][1], and [PluginLibrary][2], which is required to install MyAlerts  
+> **Current version** 3.0  
+> **Dependencies** MyAlerts 2.0.2 or above, available to download [here][1], and [PluginLibrary][2] 
 > **Author** Shade  
-> **Special thanks goes to...** euantor who developed MyAlerts, the best notification plugin ever made for MyBB installations.
 
 General
 -------
@@ -33,5 +32,5 @@ At the moment, MyAlerts Moderation Alerts Pack comes with **14 additional alerts
 * When someone edits your signature
 * When someone approves/unapproves your threads
 
-[1]: http://mods.mybb.com/view/MyAlerts
-[2]: http://mods.mybb.com/view/PluginLibrary
+[1]: https://github.com/MyBBStuff/MyAlerts
+[2]: https://github.com/frostschutz/PluginLibrary
