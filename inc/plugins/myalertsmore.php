@@ -19,7 +19,7 @@ if (!defined("PLUGINLIBRARY")) {
 }
 
 // All the available alerts should be placed here	
-$GLOBALS['alertslist'] = array("warn", "revokewarn", "deletethreads", "closethreads", "openthreads", "movethreads", "editpost", "deleteposts", "suspendposting", "moderateposting", "suspendsignature", "changeusername", "changesignature", "approvethreads", "unapprovethreads");
+$GLOBALS['alertslist'] = array("warn", "revokewarn", "deletethreads", "closethreads", "openthreads", "movethreads", "approvethreads", "unapprovethreads", "stickthreads", "unstickthreads", "editpost", "deleteposts", "suspendposting", "moderateposting", "suspendsignature", "changeusername", "changesignature");
 
 function myalertsmore_info()
 {
