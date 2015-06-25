@@ -19,7 +19,7 @@ if (!defined("PLUGINLIBRARY")) {
 }
 
 // All the available alerts should be placed here	
-$GLOBALS['alertslist'] = array("warn", "revokewarn", "deletethreads", "closethreads", "openthreads", "movethreads", "approvethreads", "unapprovethreads", "stickthreads", "unstickthreads", "editpost", "deleteposts", "suspendposting", "moderateposting", "suspendsignature", "changeusername", "changesignature");
+$GLOBALS['alertslist'] = array("warn", "revokewarn", "deletethreads", "closethreads", "openthreads", "movethreads", "approvethreads", "unapprovethreads", "softdeletethreads", "restorethreads", "stickthreads", "unstickthreads", "editpost", "deleteposts", "suspendposting", "moderateposting", "suspendsignature", "changeusername", "changesignature");
 
 function myalertsmore_info()
 {
@@ -147,7 +147,7 @@ function myalertsmore_uninstall()
 	$PL->edit_core('myalertsmore', 'inc/class_moderation.php', array(), true);
 	$PL->edit_core('myalertsmore', 'inc/datahandlers/user.php', array(), true);
 	
-	// Delete ACP settings
+	// Delete alerts
 	if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
 	    $alertTypeManager = MybbStuff_MyAlerts_AlertTypeManager::getInstance();
 	
@@ -225,11 +225,13 @@ function myalertsmore_register_formatters()
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_CloseThreadsFormatter($mybb, $lang, 'closethreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_OpenThreadsFormatter($mybb, $lang, 'openthreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_MoveThreadsFormatter($mybb, $lang, 'movethreads'));
+	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_UnapproveThreadsFormatter($mybb, $lang, 'unapprovethreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_ApproveThreadsFormatter($mybb, $lang, 'approvethreads'));
+	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_SoftDeleteThreadsFormatter($mybb, $lang, 'softdeletethreads'));
+	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_RestoreThreadsFormatter($mybb, $lang, 'restorethreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_StickThreadsFormatter($mybb, $lang, 'stickthreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_UnstickThreadsFormatter($mybb, $lang, 'unstickthreads'));
 	    // Posts
-	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_UnapproveThreadsFormatter($mybb, $lang, 'unapprovethreads'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_EditPostFormatter($mybb, $lang, 'editpost'));
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_DeletePostFormatter($mybb, $lang, 'deletepost'));
 	    // Users
@@ -241,7 +243,6 @@ function myalertsmore_register_formatters()
 	    $formatterManager->registerFormatter(new MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter($mybb, $lang, 'changesignature'));
 	}
 }
-
 
 // Generate the alerts
 // INSERT/REVOKE A WARNING
@@ -280,7 +281,7 @@ function myalertsmore_addAlert_toggle_warn(&$data)
     }
 }
 
-// DELETE ANY KIND OF THREAD
+// DELETE THREADS
 $plugins->add_hook('class_moderation_delete_thread', 'myalertsmore_addAlert_delete_threads');
 function myalertsmore_addAlert_delete_threads(&$tids)
 {
@@ -305,7 +306,7 @@ function myalertsmore_addAlert_delete_threads(&$tids)
 	}
 }
 
-// CLOSE ANY KIND OF THREAD
+// CLOSE THREADS
 $plugins->add_hook('class_moderation_close_threads', 'myalertsmore_addAlert_close_threads');
 function myalertsmore_addAlert_close_threads($tids)
 {	
@@ -339,7 +340,7 @@ function myalertsmore_addAlert_close_threads($tids)
 	}
 }
 
-// OPEN ANY KIND OF THREAD
+// OPEN THREADS
 $plugins->add_hook('class_moderation_open_threads', 'myalertsmore_addAlert_open_threads');
 function myalertsmore_addAlert_open_threads($tids)
 {
@@ -373,7 +374,7 @@ function myalertsmore_addAlert_open_threads($tids)
 	}
 }
 
-// MOVE ANY KIND OF THREAD
+// MOVE THREADS
 $plugins->add_hook('class_moderation_move_simple', 'myalertsmore_addAlert_move_threads_simple');
 $plugins->add_hook('class_moderation_move_thread_redirect', 'myalertsmore_addAlert_move_threads_simple');
 $plugins->add_hook('class_moderation_copy_thread', 'myalertsmore_addAlert_move_threads_simple');
@@ -402,7 +403,7 @@ function myalertsmore_addAlert_move_threads_simple(&$args)
 	}
 }
 
-// MOVE ANY KIND OF THREAD (INLINE MODERATION)
+// MOVE THREADS (INLINE MODERATION)
 $plugins->add_hook('class_moderation_move_threads', 'myalertsmore_addAlert_move_threads_inline');
 function myalertsmore_addAlert_move_threads_inline(&$args)
 {
@@ -423,6 +424,64 @@ function myalertsmore_addAlert_move_threads_inline(&$args)
 				$alert->setExtraDetails(array(
 					'subject' => $thread['subject'],
 					'destination_name' => $forum['name']
+				));
+	
+				MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+				
+			}
+		
+		}
+	
+	}
+}
+
+// SOFT DELETE THREADS
+$plugins->add_hook('class_moderation_soft_delete_threads', 'myalertsmore_addAlert_soft_delete_threads');
+function myalertsmore_addAlert_soft_delete_threads(&$tids)
+{
+	$alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('softdeletethreads');
+    
+    if ($alertType != null and $alertType->getEnabled()) {
+		
+		foreach ($tids as $tid) {
+		
+			$thread = get_thread($tid);
+		
+			$alert = new MybbStuff_MyAlerts_Entity_Alert((int) $thread['uid'], $alertType, 0);
+			
+			if ($GLOBALS['mybb']->user['uid'] != $thread['uid']) {
+						
+				$alert->setExtraDetails(array(
+					'subject' => $thread['subject']
+				));
+	
+				MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+				
+			}
+		
+		}
+	
+	}
+}
+
+// RESTORE THREADS
+$plugins->add_hook('class_moderation_restore_threads', 'myalertsmore_addAlert_restore_threads');
+function myalertsmore_addAlert_restore_threads(&$tids)
+{
+	$alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('restorethreads');
+    
+    if ($alertType != null and $alertType->getEnabled()) {
+		
+		foreach ($tids as $tid) {
+		
+			$thread = get_thread($tid);
+		
+			$alert = new MybbStuff_MyAlerts_Entity_Alert((int) $thread['uid'], $alertType, (int) $thread['tid']);
+			
+			if ($GLOBALS['mybb']->user['uid'] != $thread['uid']) {
+						
+				$alert->setExtraDetails(array(
+					'subject' => $thread['subject']
 				));
 	
 				MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
