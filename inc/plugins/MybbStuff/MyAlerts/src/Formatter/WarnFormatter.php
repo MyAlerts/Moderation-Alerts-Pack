@@ -24,19 +24,19 @@ class MybbStuff_MyAlerts_Formatter_WarnFormatter extends MybbStuff_MyAlerts_Form
         
         // This warning will expire today
         if ($alertContent['expires'] < strtotime('tomorrow') and $expiry_date) {
-        	$expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_will, $expiry_date, '');
+        	$expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_will, $expiry_date, '');
         }
         // This warning has expired
         else if (!$expiry_date) {
-	        $expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_has, $this->lang->myalertsmore_warn_d, '');
+	        $expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_has, $this->lang->modpack_warn_d, '');
         }
         // This warning will expire in the future
         else {
-        	$expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_will, $this->lang->myalertsmore_warn_on, $expiry_date);
+        	$expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_will, $this->lang->modpack_warn_on, $expiry_date);
         }
 
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_warn,
+            $this->lang->modpack_warn,
             $outputAlert['from_user'],
             $alertContent['points'],
             $expiry_label
@@ -51,7 +51,7 @@ class MybbStuff_MyAlerts_Formatter_WarnFormatter extends MybbStuff_MyAlerts_Form
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_warn) {
+        if (!$this->lang->modpack_warn) {
             $this->lang->load('myalertsmore');
         }
     }

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Alert formatter for change signature alerts.
+ * Alert formatter for remove from buddylist alerts.
  */
-class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
+class MybbStuff_MyAlerts_Formatter_RemoveFromBuddylistFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
 {
     /**
      * Format an alert into it's output string to be used in both the main alerts listing page and the popup.
@@ -15,7 +15,7 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
         return $this->lang->sprintf(
-            $this->lang->modpack_changesignature,
+            $this->lang->modpack_removefrombuddylist,
             $outputAlert['from_user']
         );
     }
@@ -28,7 +28,7 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
      */
     public function init()
     {
-        if (!$this->lang->modpack_changesignature) {
+        if (!$this->lang->modpack_removefrombuddylist) {
             $this->lang->load('myalertsmore');
         }
     }
@@ -42,6 +42,6 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
      */
     public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert)
     {	
-    	return $this->mybb->settings['bburl'] . '/usercp.php?action=editsig';
+    	return false;
     }
 }

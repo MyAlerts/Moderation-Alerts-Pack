@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_OpenThreadsFormatter extends MybbStuff_MyAler
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_openthreads,
+            $this->lang->modpack_openthreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_OpenThreadsFormatter extends MybbStuff_MyAler
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_openthreads) {
+        if (!$this->lang->modpack_openthreads) {
             $this->lang->load('myalertsmore');
         }
     }

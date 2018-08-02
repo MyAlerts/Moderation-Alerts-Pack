@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_ChangeUsernameFormatter extends MybbStuff_MyA
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_changeusername,
+            $this->lang->modpack_changeusername,
             $outputAlert['from_user'],
             $alertContent['old_name'],
             $alertContent['new_name']
@@ -32,7 +32,7 @@ class MybbStuff_MyAlerts_Formatter_ChangeUsernameFormatter extends MybbStuff_MyA
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_changeusername) {
+        if (!$this->lang->modpack_changeusername) {
             $this->lang->load('myalertsmore');
         }
     }

@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_RestoreThreadsFormatter extends MybbStuff_MyA
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_restorethreads,
+            $this->lang->modpack_restorethreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_RestoreThreadsFormatter extends MybbStuff_MyA
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_restorethreads) {
+        if (!$this->lang->modpack_restorethreads) {
             $this->lang->load('myalertsmore');
         }
     }

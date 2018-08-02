@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_DeleteThreadsFormatter extends MybbStuff_MyAl
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_deletethreads,
+            $this->lang->modpack_deletethreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_DeleteThreadsFormatter extends MybbStuff_MyAl
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_deletethreads) {
+        if (!$this->lang->modpack_deletethreads) {
             $this->lang->load('myalertsmore');
         }
     }

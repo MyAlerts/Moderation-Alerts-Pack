@@ -15,7 +15,7 @@ class MybbStuff_MyAlerts_Formatter_EditPostFormatter extends MybbStuff_MyAlerts_
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_editpost,
+            $this->lang->modpack_editpost,
             $outputAlert['from_user']
         );
     }
@@ -28,7 +28,7 @@ class MybbStuff_MyAlerts_Formatter_EditPostFormatter extends MybbStuff_MyAlerts_
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_editpost) {
+        if (!$this->lang->modpack_editpost) {
             $this->lang->load('myalertsmore');
         }
     }

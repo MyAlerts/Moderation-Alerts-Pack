@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Alert formatter for change signature alerts.
+ * Alert formatter for soft delete posts alerts.
  */
-class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
+class MybbStuff_MyAlerts_Formatter_SoftDeletePostsFormatter extends MybbStuff_MyAlerts_Formatter_AbstractFormatter
 {
     /**
      * Format an alert into it's output string to be used in both the main alerts listing page and the popup.
@@ -14,9 +14,16 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
      */
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
+    	$alertContent = $alert->getExtraDetails();
+    	
+    	$plural = ($alertContent['counter'] > 1) ? $this->lang->modpack_plural : '';
+    	
         return $this->lang->sprintf(
-            $this->lang->modpack_changesignature,
-            $outputAlert['from_user']
+            $this->lang->modpack_softdeleteposts,
+            $outputAlert['from_user'],
+            $alertContent['counter'],
+            $plural,
+            $alertContent['subject']
         );
     }
 
@@ -28,7 +35,7 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
      */
     public function init()
     {
-        if (!$this->lang->modpack_changesignature) {
+        if (!$this->lang->modpack_softdeleteposts) {
             $this->lang->load('myalertsmore');
         }
     }
@@ -42,6 +49,6 @@ class MybbStuff_MyAlerts_Formatter_ChangeSignatureFormatter extends MybbStuff_My
      */
     public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert)
     {	
-    	return $this->mybb->settings['bburl'] . '/usercp.php?action=editsig';
+    	return $this->mybb->settings['bburl'] . '/' . get_thread_link((int) $alert->getObjectId());
     }
 }

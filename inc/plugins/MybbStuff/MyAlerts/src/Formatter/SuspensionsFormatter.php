@@ -21,10 +21,10 @@ class MybbStuff_MyAlerts_Formatter_SuspensionsFormatter extends MybbStuff_MyAler
 		if ($type == 'suspendposting') {
 		
 			if (!$alertContent['expiry_date']) {
-				$label = $this->lang->myalertsmore_unsuspend_posting;
+				$label = $this->lang->modpack_unsuspend_posting;
 			}
 			else {
-				$label = $this->lang->myalertsmore_suspend_posting;
+				$label = $this->lang->modpack_suspend_posting;
 			}
 			
 		}
@@ -32,10 +32,10 @@ class MybbStuff_MyAlerts_Formatter_SuspensionsFormatter extends MybbStuff_MyAler
 		else if ($type == 'moderateposting') {
 			
 			if (!$alertContent['expiry_date']) {
-				$label = $this->lang->myalertsmore_unmoderate_posting;
+				$label = $this->lang->modpack_unmoderate_posting;
 			}
 			else {
-				$label = $this->lang->myalertsmore_moderate_posting;
+				$label = $this->lang->modpack_moderate_posting;
 			}
 			
 		}
@@ -43,10 +43,10 @@ class MybbStuff_MyAlerts_Formatter_SuspensionsFormatter extends MybbStuff_MyAler
 		else if ($type == 'suspendsignature') {
 			
 			if (!$alertContent['expiry_date']) {
-				$label = $this->lang->myalertsmore_unsuspend_signature;
+				$label = $this->lang->modpack_unsuspend_signature;
 			}
 			else {
-				$label = $this->lang->myalertsmore_suspend_signature;
+				$label = $this->lang->modpack_suspend_signature;
 			}
 			
 		}
@@ -59,11 +59,11 @@ class MybbStuff_MyAlerts_Formatter_SuspensionsFormatter extends MybbStuff_MyAler
         
         // This suspension will expire today
         if ($alertContent['expiry_date'] < strtotime('tomorrow') and $expiry_date) {
-        	$expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_will, $expiry_date, '');
+        	$expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_will, $expiry_date, '');
         }
         // This suspension has expired
         else if (!$expiry_date and $alertContent['expiry_date']) {
-	        $expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_has, $this->lang->myalertsmore_warn_d, '');
+	        $expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_has, $this->lang->modpack_warn_d, '');
         }
         // This is not a suspension
         else if (!$alertContent['expiry_date']) {
@@ -71,11 +71,11 @@ class MybbStuff_MyAlerts_Formatter_SuspensionsFormatter extends MybbStuff_MyAler
         }
         // This suspension will expire in the future
         else {
-        	$expiry_label = $this->lang->sprintf($this->lang->myalertsmore_warn_expires, $this->lang->myalertsmore_warn_will, $this->lang->myalertsmore_warn_on, $expiry_date);
+        	$expiry_label = $this->lang->sprintf($this->lang->modpack_warn_expires, $this->lang->modpack_warn_will, $this->lang->modpack_warn_on, $expiry_date);
         }
 
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_suspensions,
+            $this->lang->modpack_suspensions,
             $outputAlert['from_user'],
             $label,
             $expiry_label

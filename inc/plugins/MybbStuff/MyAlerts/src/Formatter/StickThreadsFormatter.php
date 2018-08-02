@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_StickThreadsFormatter extends MybbStuff_MyAle
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_stickthreads,
+            $this->lang->modpack_stickthreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_StickThreadsFormatter extends MybbStuff_MyAle
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_stickthreads) {
+        if (!$this->lang->modpack_stickthreads) {
             $this->lang->load('myalertsmore');
         }
     }

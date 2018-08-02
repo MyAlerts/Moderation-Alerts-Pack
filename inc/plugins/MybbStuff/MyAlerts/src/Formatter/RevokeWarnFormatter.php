@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_RevokeWarnFormatter extends MybbStuff_MyAlert
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_revokewarn,
+            $this->lang->modpack_revokewarn,
             $outputAlert['from_user'],
             $alertContent['points'],
             $alertContent['reason']
@@ -32,7 +32,7 @@ class MybbStuff_MyAlerts_Formatter_RevokeWarnFormatter extends MybbStuff_MyAlert
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_revokewarn) {
+        if (!$this->lang->modpack_revokewarn) {
             $this->lang->load('myalertsmore');
         }
     }

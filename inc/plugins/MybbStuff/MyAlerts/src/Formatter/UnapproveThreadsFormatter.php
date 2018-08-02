@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_UnapproveThreadsFormatter extends MybbStuff_M
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_unapprovethreads,
+            $this->lang->modpack_unapprovethreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_UnapproveThreadsFormatter extends MybbStuff_M
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_unapprovethreads) {
+        if (!$this->lang->modpack_unapprovethreads) {
             $this->lang->load('myalertsmore');
         }
     }

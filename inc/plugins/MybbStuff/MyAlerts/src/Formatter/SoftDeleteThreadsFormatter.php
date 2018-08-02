@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_SoftDeleteThreadsFormatter extends MybbStuff_
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_softdeletethreads,
+            $this->lang->modpack_softdeletethreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_SoftDeleteThreadsFormatter extends MybbStuff_
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_softdeletethreads) {
+        if (!$this->lang->modpack_softdeletethreads) {
             $this->lang->load('myalertsmore');
         }
     }

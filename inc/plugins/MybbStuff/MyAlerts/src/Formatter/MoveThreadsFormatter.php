@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_MoveThreadsFormatter extends MybbStuff_MyAler
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_movethreads,
+            $this->lang->modpack_movethreads,
             $outputAlert['from_user'],
             $alertContent['subject'],
             $alertContent['destination_name']
@@ -32,7 +32,7 @@ class MybbStuff_MyAlerts_Formatter_MoveThreadsFormatter extends MybbStuff_MyAler
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_movethreads) {
+        if (!$this->lang->modpack_movethreads) {
             $this->lang->load('myalertsmore');
         }
     }

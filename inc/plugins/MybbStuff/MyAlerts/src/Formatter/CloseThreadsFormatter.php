@@ -17,7 +17,7 @@ class MybbStuff_MyAlerts_Formatter_CloseThreadsFormatter extends MybbStuff_MyAle
     	$alertContent = $alert->getExtraDetails();
     	
         return $this->lang->sprintf(
-            $this->lang->myalertsmore_closethreads,
+            $this->lang->modpack_closethreads,
             $outputAlert['from_user'],
             $alertContent['subject']
         );
@@ -31,7 +31,7 @@ class MybbStuff_MyAlerts_Formatter_CloseThreadsFormatter extends MybbStuff_MyAle
      */
     public function init()
     {
-        if (!$this->lang->myalertsmore_closethreads) {
+        if (!$this->lang->modpack_closethreads) {
             $this->lang->load('myalertsmore');
         }
     }
