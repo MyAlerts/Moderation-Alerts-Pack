@@ -15,11 +15,13 @@ class MybbStuff_MyAlerts_Formatter_OpenThreadsFormatter extends MybbStuff_MyAler
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_openthreads,
             $outputAlert['from_user'],
-            $alertContent['subject']
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['subject'])
+            )
         );
     }
 
@@ -34,6 +36,9 @@ class MybbStuff_MyAlerts_Formatter_OpenThreadsFormatter extends MybbStuff_MyAler
         if (!$this->lang->modpack_openthreads) {
             $this->lang->load('myalertsmore');
         }
+
+        require_once MYBB_ROOT . 'inc/class_parser.php';
+        $this->parser = new postParser;
     }
 
     /**

@@ -15,12 +15,16 @@ class MybbStuff_MyAlerts_Formatter_ChangeUsernameFormatter extends MybbStuff_MyA
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_changeusername,
             $outputAlert['from_user'],
-            $alertContent['old_name'],
-            $alertContent['new_name']
+            htmlspecialchars_uni(
+                $alertContent['old_name']
+            ),
+            htmlspecialchars_uni(
+                $alertContent['new_name']
+            )
         );
     }
 

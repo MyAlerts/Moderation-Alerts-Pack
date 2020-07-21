@@ -15,12 +15,16 @@ class MybbStuff_MyAlerts_Formatter_MergeThreadsFormatter extends MybbStuff_MyAle
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_mergethreads,
             $outputAlert['from_user'],
-            $alertContent['old_subject'],
-            $alertContent['new_subject']
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['old_subject'])
+            ),
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['new_subject'])
+            )
         );
     }
 
@@ -35,6 +39,9 @@ class MybbStuff_MyAlerts_Formatter_MergeThreadsFormatter extends MybbStuff_MyAle
         if (!$this->lang->modpack_mergethreads) {
             $this->lang->load('myalertsmore');
         }
+
+        require_once MYBB_ROOT . 'inc/class_parser.php';
+        $this->parser = new postParser;
     }
 
     /**

@@ -15,15 +15,17 @@ class MybbStuff_MyAlerts_Formatter_RestorePostsFormatter extends MybbStuff_MyAle
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
     	$plural = ($alertContent['counter'] > 1) ? $this->lang->modpack_plural : '';
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_restoreposts,
             $outputAlert['from_user'],
             $alertContent['counter'],
             $plural,
-            $alertContent['subject']
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['subject'])
+            )
         );
     }
 
@@ -38,6 +40,9 @@ class MybbStuff_MyAlerts_Formatter_RestorePostsFormatter extends MybbStuff_MyAle
         if (!$this->lang->modpack_restoreposts) {
             $this->lang->load('myalertsmore');
         }
+
+        require_once MYBB_ROOT . 'inc/class_parser.php';
+        $this->parser = new postParser;
     }
 
     /**
@@ -48,7 +53,7 @@ class MybbStuff_MyAlerts_Formatter_RestorePostsFormatter extends MybbStuff_MyAle
      * @return string The built alert, preferably an absolute link.
      */
     public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert)
-    {	
+    {
     	return $this->mybb->settings['bburl'] . '/' . get_thread_link((int) $alert->getObjectId());
     }
 }

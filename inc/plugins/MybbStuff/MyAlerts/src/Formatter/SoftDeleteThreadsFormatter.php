@@ -15,11 +15,13 @@ class MybbStuff_MyAlerts_Formatter_SoftDeleteThreadsFormatter extends MybbStuff_
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_softdeletethreads,
             $outputAlert['from_user'],
-            $alertContent['subject']
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['subject'])
+            )
         );
     }
 
@@ -34,6 +36,9 @@ class MybbStuff_MyAlerts_Formatter_SoftDeleteThreadsFormatter extends MybbStuff_
         if (!$this->lang->modpack_softdeletethreads) {
             $this->lang->load('myalertsmore');
         }
+
+        require_once MYBB_ROOT . 'inc/class_parser.php';
+        $this->parser = new postParser;
     }
 
     /**

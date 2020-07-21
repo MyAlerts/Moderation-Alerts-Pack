@@ -15,11 +15,13 @@ class MybbStuff_MyAlerts_Formatter_DeletePostFormatter extends MybbStuff_MyAlert
     public function formatAlert(MybbStuff_MyAlerts_Entity_Alert $alert, array $outputAlert)
     {
     	$alertContent = $alert->getExtraDetails();
-    	
+
         return $this->lang->sprintf(
             $this->lang->modpack_deleteposts,
             $outputAlert['from_user'],
-            $alertContent['thread_subject']
+            htmlspecialchars_uni(
+                $this->parser->parse_badwords($alertContent['thread_subject'])
+            )
         );
     }
 
@@ -34,6 +36,9 @@ class MybbStuff_MyAlerts_Formatter_DeletePostFormatter extends MybbStuff_MyAlert
         if (!$this->lang->modpack_deleteposts) {
             $this->lang->load('myalertsmore');
         }
+
+        require_once MYBB_ROOT . 'inc/class_parser.php';
+        $this->parser = new postParser;
     }
 
     /**
@@ -44,7 +49,7 @@ class MybbStuff_MyAlerts_Formatter_DeletePostFormatter extends MybbStuff_MyAlert
      * @return string The built alert, preferably an absolute link.
      */
     public function buildShowLink(MybbStuff_MyAlerts_Entity_Alert $alert)
-    {	
+    {
     	return $this->mybb->settings['bburl'] . '/' . get_thread_link((int) $alert->getObjectId());
     }
 }

@@ -7,7 +7,7 @@
  * @package Moderation Alerts Pack
  * @author  Shade <shad3-@outlook.com>
  * @license http://opensource.org/licenses/mit-license.php MIT license (same as MyAlerts)
- * @version 4.0.1
+ * @version 4.0.2
  */
 
 if (!defined('IN_MYBB')) {
@@ -38,7 +38,7 @@ function modpack_info()
 		'description'	=>	'Provides several more actions related to moderation for @Euan T\'s <a href="http://community.mybb.com/thread-171301.html"><b>MyAlerts</b></a> plugin.' . $myalerts_notice,
 		'website'		=>	'https://www.mybboost.com/forum-moderation-alerts-pack',
 		'author'		=>	'Shade',
-		'version'		=>	'4.0.1',
+		'version'		=>	'4.0.2',
 		'compatibility'	=>	'18*'
 	];
 
